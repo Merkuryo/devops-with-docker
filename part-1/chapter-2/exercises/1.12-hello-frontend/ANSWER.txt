@@ -1,0 +1,74 @@
+## Exercise 1.12 - Hello Frontend (Mandatory)
+
+## Dockerfile
+
+```dockerfile
+FROM node:16
+
+WORKDIR /usr/src/app
+
+COPY . .
+
+RUN npm install && npm run build
+
+RUN npm install -g serve
+
+EXPOSE 5000
+
+CMD ["serve", "-s", "-l", "5000", "build"]
+```
+
+## Build Command
+
+```bash
+docker build -t frontend-app .
+```
+
+## Run Command
+
+```bash
+docker run -d -p 5000:5000 frontend-app
+```
+
+Or all in one:
+
+```bash
+docker build -t frontend-app . && docker run -d -p 5000:5000 frontend-app
+```
+
+## Accessing the Application
+
+Once the container is running, navigate to:
+```
+http://localhost:5000
+```
+
+You should see the Docker frontend application with a message confirming successful connection.
+
+## Explanation
+
+The Dockerfile:
+
+1. **FROM node:16** - Uses Node.js 16 LTS (recommended by the project README)
+2. **WORKDIR /usr/src/app** - Sets the working directory in the container
+3. **COPY . .** - Copies the entire project from the host to the container
+4. **RUN npm install && npm run build** - Installs dependencies and builds the React application into the `build` folder
+5. **RUN npm install -g serve** - Installs the `serve` package globally to serve static files
+6. **EXPOSE 5000** - Exposes port 5000 where the application will listen
+7. **CMD ["serve", "-s", "-l", "5000", "build"]** - Runs the serve command to serve the built application
+
+## Key Points
+
+- **node:16** - Provides Node.js 16 LTS, which is compatible with the project
+- **npm install && npm run build** - Builds the React application into static files
+- **serve** - A lightweight Node.js package for serving static files
+- **-s** flag - Serves any non-file requests to index.html (required for single-page apps)
+- **-l 5000** - Listens on port 5000 as required by the exercise
+- Port 5000 is properly exposed and published with the `-p` flag
+
+## Success Criteria Met
+
+- ✓ Dockerfile builds successfully without errors
+- ✓ Container runs with port 5000 exposed and published
+- ✓ Application responds at http://localhost:5000 with the frontend HTML
+- ✓ No code modifications made to the project
