@@ -33,23 +33,85 @@ Repository containing solutions to exercises from the University of Helsinki's D
 - **2.2 Simple Service with Browser** ✓ - Docker Compose with port mapping for web service
 - **2.3 Project with Compose** ✓ (Mandatory) - Docker Compose with frontend and backend
 - **2.4 Redis** ✓ (Mandatory) - Docker Compose with Redis caching layer
+- **2.5 Scale** ✓ - Docker Compose service scaling with multiple replicas
+- **2.6 PostgreSQL** ✓ - Docker Compose with PostgreSQL database integration
+- **2.7 Bind Mount** ✓ - Using bind mounts for persistent data storage
+- **2.8 Reverse Proxy** ✓ - Nginx reverse proxy configuration for multi-service routing
+- **2.9 Fixup** ✓ - CORS header fixes and proxy configuration refinement
+- **2.10 Close Ports** ✓ - Port closure and security (only expose entry point)
+- **2.11 Your Dev Env** ✓ (Mandatory) - Containerized Node.js development environment with hot-reload
+
+## Statistics
+
+- **Total Exercises Completed:** 27/27
+  - Part 1: 16/16 exercises ✓
+  - Part 2, Chapter 1: 11/11 exercises ✓
+
+- **Technologies Mastered:**
+  - Docker containers and images
+  - Docker Compose orchestration
+  - Volume management (managed volumes, bind mounts, named volumes)
+  - Port mapping and network configuration
+  - Environment variables and service communication
+  - Reverse proxy (Nginx)
+  - Database integration (PostgreSQL)
+  - Caching layers (Redis)
+  - Containerized development environments with hot-reload
+  - Cloud deployment (Render.com)
 
 ## Repository Structure
 
 ```
 .
 ├── README.md
-└── part-1/
-    └── chapter-2/
+├── part-1/
+│   └── chapter-2/
+│       └── exercises/
+│           ├── 1.1-getting-started/
+│           ├── 1.2-cleanup/
+│           ├── 1.3-secret-message/
+│           ├── 1.4-missing-dependencies/
+│           ├── 1.5-sizes-of-images/
+│           ├── 1.6-hello-docker-hub/
+│           ├── 1.7-image-for-script/
+│           ├── 1.8-two-line-dockerfile/
+│           ├── 1.9-volumes/
+│           ├── 1.10-ports-open/
+│           ├── 1.11-spring/
+│           ├── 1.12-hello-frontend/
+│           ├── 1.13-hello-backend/
+│           ├── 1.14-environment/
+│           ├── 1.15-homework/
+│           └── 1.16-cloud-deployment/
+└── part-2/
+    └── chapter-1/
         └── exercises/
-            └── 1.1-getting-started/
-                ├── ANSWER.txt
-                └── README.md
+            ├── 2.1-simple-service/
+            ├── 2.2-service-with-browser/
+            ├── 2.3-project-with-compose/
+            ├── 2.4-redis/
+            ├── 2.5-scale/
+            ├── 2.6-postgres/
+            ├── 2.7-bind-mount/
+            ├── 2.8-reverse-proxy/
+            ├── 2.9-fixup/
+            ├── 2.10-close-ports/
+            └── 2.11-your-dev-env/
 ```
 
 ## About This Course
 
-The DevOps with Docker course from the University of Helsinki covers containerization using Docker, orchestration, and modern DevOps practices.
+The DevOps with Docker course from the University of Helsinki covers containerization using Docker, orchestration, and modern DevOps practices. This repository documents the complete journey through the course with working implementations of all exercises.
 
-- Official Course: https://docker-esa.dev/
-- Docker Documentation: https://docs.docker.com/
+**Key Learning Outcomes:**
+- Understanding container architecture and lifecycle
+- Building and optimizing Docker images
+- Multi-container orchestration with Docker Compose
+- Volume management strategies for data persistence
+- Network configuration and service communication
+- Development environment containerization
+- Infrastructure as code principles
+
+- **Official Course:** https://docker-esa.dev/
+- **Docker Documentation:** https://docs.docker.com/
+- **GitHub Repository:** https://github.com/Merkuryo/devops-with-docker
