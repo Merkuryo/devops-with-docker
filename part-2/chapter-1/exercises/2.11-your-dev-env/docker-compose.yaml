@@ -1,0 +1,20 @@
+services:
+  node-dev-env:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: node-dev-env
+    ports:
+      - 3000:3000
+    volumes:
+      # Bind mount for source code - enables hot-reload
+      - ./:/usr/src/app
+      # Named volume for node_modules - prevents local node_modules from interfering
+      - node_modules:/usr/src/app/node_modules
+    environment:
+      - NODE_ENV=development
+    command: npm start
+    restart: unless-stopped
+
+volumes:
+  node_modules:
