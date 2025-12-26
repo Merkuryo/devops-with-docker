@@ -1,0 +1,34 @@
+# Exercise 1.1 Answer
+
+## Commands Run
+
+Started with three separate commands to spin up nginx containers:
+
+```
+$ docker run -d nginx
+$ docker run -d nginx
+$ docker run -d nginx
+```
+
+The image wasn't available locally so Docker pulled it. Got back three container IDs:
+- 6db23150ab14
+- 8d022b680006
+- e224106e17b0
+
+Then stopped two of them by their auto-generated names:
+
+```
+$ docker stop bold_faraday zen_greider
+```
+
+## Final Output
+
+```
+$ docker ps -a --filter ancestor=nginx
+CONTAINER ID   IMAGE     COMMAND                  CREATED              STATUS                      PORTS     NAMES
+e224106e17b0   nginx     "/docker-entrypoint.…"   47 seconds ago       Exited (0) 20 seconds ago             bold_faraday
+8d022b680006   nginx     "/docker-entrypoint.…"   59 seconds ago       Exited (0) 21 seconds ago             zen_greider
+6db23150ab14   nginx     "/docker-entrypoint.…"   About a minute ago   Up About a minute           80/tcp    crazy_wing
+```
+
+The output shows exactly what was asked for - two stopped containers (bold_faraday and zen_greider) and one that's still running (crazy_wing). Pretty straightforward exercise to get familiar with starting containers and using docker ps to check their status.
