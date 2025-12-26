@@ -1,0 +1,44 @@
+## Command to Complete the Exercise
+
+### Create a file locally:
+```bash
+touch text.log
+```
+
+### Run the container with bind mount:
+```bash
+docker run -d -v "$(pwd)/text.log:/usr/src/app/text.log" devopsdockeruh/simple-web-service:alpine
+```
+
+## Explanation
+
+The `-v` option creates a bind mount that links a file or directory from the host machine into the container:
+
+- `"$(pwd)/text.log"` - The source file on the host machine (current directory)
+- `:/usr/src/app/text.log` - The destination path inside the container
+
+When the container writes to `/usr/src/app/text.log`, the changes are immediately reflected in the `text.log` file on the host machine.
+
+## Verification
+
+After running the container, check that logs are being written:
+
+```bash
+cat text.log
+```
+
+You should see timestamps being added every 2 seconds:
+```
+2025-12-26 15:04:00 +0000 UTC
+2025-12-26 15:04:02 +0000 UTC
+2025-12-26 15:04:04 +0000 UTC
+2025-12-26 15:04:06 +0000 UTC
+2025-12-26 15:04:08 +0000 UTC
+```
+
+## Key Concepts
+
+- **Bind Mount** - A way to mount a file or directory from the host into the container
+- **Ephemeral Storage** - Without volumes, files created in containers are lost when the container is removed
+- **-v Option** - Docker's option to create volumes or bind mounts
+- **File Persistence** - Changes made inside the container to mounted files are immediately visible on the host
