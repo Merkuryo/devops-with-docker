@@ -1,0 +1,24 @@
+## Commands to See the Secret Message
+
+Start the container:
+```bash
+docker run -d --name simple-web-service devopsdockeruh/simple-web-service:ubuntu
+```
+
+Access the container and follow the logs:
+```bash
+docker exec simple-web-service tail -f ./text.log
+```
+
+Or read the entire log file:
+```bash
+docker exec simple-web-service cat ./text.log
+```
+
+## The Secret Message
+
+```
+You can find the source code here: https://github.com/docker-hy
+```
+
+The message appears every 10 seconds in the log file, interspersed with timestamp entries. The application running inside the container writes both regular timestamps and this secret message periodically to the text.log file.
