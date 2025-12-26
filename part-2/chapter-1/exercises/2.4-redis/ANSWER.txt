@@ -1,0 +1,150 @@
+## Exercise 2.4 - Redis (Mandatory)
+
+### docker-compose.yaml
+
+```yaml
+services:
+  backend:
+    image: backend-app
+    build:
+      context: ../../../../../../tmp/material-applications/example-backend
+      dockerfile: Dockerfile
+    container_name: example-backend
+    ports:
+      - 8080:8080
+    environment:
+      - REQUEST_ORIGIN=http://localhost:5000
+      - REDIS_HOST=redis
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  frontend:
+    image: frontend-app
+    build:
+      context: ../../../../../../tmp/material-applications/example-frontend
+      dockerfile: Dockerfile
+    container_name: example-frontend
+    ports:
+      - 5000:5000
+    environment:
+      - REACT_APP_BACKEND_URL=http://localhost:8080
+    depends_on:
+      - backend
+
+  redis:
+    image: redis:7
+    container_name: redis
+```
+
+### Running the Services
+
+```bash
+docker compose up
+```
+
+### Testing the Setup
+
+**1. Access frontend in browser:**
+```
+http://localhost:5000
+```
+
+**2. Find the Exercise 2.4 button**
+- Click the button for Exercise 2.4
+- It will make a request to /ping?redis=true
+- First request will be slow (calls slow API)
+- Subsequent requests will be fast (cached in Redis)
+- Button should turn GREEN
+
+**3. Test backend directly:**
+```bash
+curl http://localhost:8080/ping?redis=true
+```
+
+### Stopping the Services
+
+```bash
+docker compose down
+```
+
+### Key Components Explained
+
+**Backend Service:**
+- `REDIS_HOST=redis` - Tells backend where Redis is located
+- `depends_on: - redis` - Ensures Redis starts first
+- `restart: unless-stopped` - Restarts if Redis takes time to initialize
+- Uses default Redis port 6379 (no explicit port needed)
+
+**Redis Service:**
+- `image: redis:7` - Official Redis image
+- NO ports configuration - Only accessible within Docker network
+- Service name "redis" is used by backend to connect
+- Runs on default port 6379 internally
+
+**Frontend Service:**
+- Same configuration as Exercise 2.3
+- Unchanged from previous exercises
+
+### Docker Network Communication
+
+Inside Docker Compose:
+```
+backend → redis:6379 (via internal DNS)
+frontend → backend:8080 (via internal DNS)
+```
+
+Outside Docker:
+```
+localhost:5000 → frontend
+localhost:8080 → backend
+(Redis NOT accessible from outside)
+```
+
+### How Caching Works
+
+1. **First Request:** 
+   - Backend checks Redis for data
+   - Data not in cache
+   - Calls slow API
+   - Stores result in Redis
+   - Returns to frontend (slow)
+
+2. **Subsequent Requests:**
+   - Backend checks Redis
+   - Data found in cache
+   - Returns immediately (fast)
+
+### Why No Ports for Redis?
+
+- Redis doesn't need to be accessible from outside Docker
+- Only backend service needs to access it
+- Better security (no external access)
+- Simplifies configuration
+- Demonstrates Docker network best practices
+
+### Verification Checklist
+
+- ✓ docker-compose.yaml has three services (backend, frontend, redis)
+- ✓ Backend has REDIS_HOST=redis environment variable
+- ✓ Backend depends_on redis
+- ✓ Backend has restart: unless-stopped
+- ✓ Redis has no ports configuration
+- ✓ `docker compose up` starts all three services
+- ✓ Frontend accessible at http://localhost:5000
+- ✓ Backend accessible at http://localhost:8080
+- ✓ Exercise 2.4 button turns green
+- ✓ `docker compose down` stops all services
+
+### Troubleshooting
+
+**Button doesn't turn green:**
+- Check that REDIS_HOST=redis is set
+- Verify all services started: `docker compose ps`
+- Check logs: `docker compose logs backend`
+- Ensure restart: unless-stopped allows time for Redis to start
+
+**Redis connection errors:**
+- Redis service must be named "redis" (exact match)
+- Service name is different from container name
+- Backend uses service name "redis", not container name
