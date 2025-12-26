@@ -17,6 +17,7 @@ Repository containing solutions to exercises from the University of Helsinki's D
 - **1.7 Image for Script** ✓ - Building a custom Docker image with Dockerfile
 - **1.8 Two Line Dockerfile** ✓ - Using ENTRYPOINT with default CMD arguments
 - **1.9 Volumes** ✓ - Using bind mounts to access container files from host
+- **1.10 Ports Open** ✓ - Exposing web services using port mapping
 
 ## Repository Structure
 

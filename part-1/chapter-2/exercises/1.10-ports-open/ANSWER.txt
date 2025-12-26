@@ -1,0 +1,58 @@
+## Command to Start the Web Service
+
+```bash
+docker run -p 8080:8080 devopsdockeruh/simple-web-service:alpine server
+```
+
+## Alternative Commands
+
+If you want to run it in detached mode:
+```bash
+docker run -d -p 8080:8080 devopsdockeruh/simple-web-service:alpine server
+```
+
+Or using the image created in Exercise 1.8:
+```bash
+docker run -d -p 8080:8080 web-server
+```
+
+## Accessing the Web Service
+
+Once the container is running, you can access the service in your browser:
+```
+http://localhost:8080
+```
+
+Or using curl:
+```bash
+curl http://localhost:8080
+```
+
+## Expected Output
+
+```json
+{"message":"You connected to the following path: /","path":"/"}
+```
+
+## Explanation
+
+- **-p 8080:8080** - Maps port 8080 from the container to port 8080 on the host
+  - First number: host port
+  - Second number: container port
+- **devopsdockeruh/simple-web-service:alpine** - The base image that has a web service
+- **server** - The argument that tells the image to start the web service (listening on port 8080)
+
+## Port Mapping Concepts
+
+- **Exposing a port** - Declaring in the Dockerfile (EXPOSE 8080) that the service listens on a port
+- **Publishing a port** - Using -p flag to map host ports to container ports
+- **localhost** - Special hostname referring to your local machine (same as 127.0.0.1)
+
+## Security Note
+
+The syntax `-p 8080:8080` opens the port to all interfaces. For more security, you can restrict to localhost only:
+```bash
+docker run -p 127.0.0.1:8080:8080 devopsdockeruh/simple-web-service:alpine server
+```
+
+This would only allow connections from your own machine, not from the internet.
