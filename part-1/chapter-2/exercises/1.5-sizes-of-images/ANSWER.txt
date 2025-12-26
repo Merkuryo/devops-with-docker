@@ -1,0 +1,44 @@
+## Image Sizes Comparison
+
+### Pull both images:
+```bash
+docker pull devopsdockeruh/simple-web-service:ubuntu
+docker pull devopsdockeruh/simple-web-service:alpine
+```
+
+### Compare sizes:
+```bash
+docker image ls | grep "simple-web-service"
+```
+
+## Results
+
+**Alpine image size:** 15.7 MB
+
+**Ubuntu image size:** 83 MB
+
+Alpine is approximately 5 times smaller than Ubuntu.
+
+## Verification of Secret Message in Alpine
+
+Alpine Linux doesn't have bash, but it has sh (shell). The secret message functionality is identical in both versions.
+
+### Access the Alpine container:
+```bash
+docker run -d --name simple-web-alpine devopsdockeruh/simple-web-service:alpine
+docker exec simple-web-alpine cat ./text.log | grep "Secret"
+```
+
+### Output:
+```
+Secret message is: 'You can find the source code here: https://github.com/docker-hy'
+```
+
+The secret message appears every 10 seconds in the Alpine version, just like in the Ubuntu version, confirming that the application functionality is identical despite the significant size difference.
+
+## Key Takeaways
+
+- Alpine Linux is a minimal Linux distribution designed to be lightweight
+- The same application runs on both Ubuntu and Alpine with identical functionality
+- Alpine image is about 5 times smaller, making it more suitable for production environments
+- Alpine uses `sh` instead of `bash`, but provides the same core functionality

@@ -12,6 +12,7 @@ Repository containing solutions to exercises from the University of Helsinki's D
 - **1.2 Cleanup** ✓ - Removing all containers and images
 - **1.3 Secret Message** ✓ - Accessing running containers with docker exec
 - **1.4 Missing Dependencies** ✓ - Installing packages inside a running container
+- **1.5 Sizes of Images** ✓ - Comparing Ubuntu and Alpine image sizes
 
 ## Repository Structure
 
