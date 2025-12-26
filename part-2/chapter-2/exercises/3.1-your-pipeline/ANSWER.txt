@@ -1,0 +1,182 @@
+EXERCISE 3.1: YOUR DEPLOYMENT PIPELINE
+======================================
+
+WHAT I HAVE DONE:
+
+I created a complete CI/CD deployment pipeline that automatically builds, pushes, and deploys a Node.js/Express application using GitHub Actions and Watchtower.
+
+PIPELINE ARCHITECTURE:
+
+1. GitHub Actions (First Half - Build & Push):
+   - Workflow: .github/workflows/build.yml
+   - Triggers on: Every push to main branch
+   - Steps:
+     * Checkout repository code
+     * Set up Docker Buildx (multi-platform builder)
+     * Log in to Docker Hub using GitHub secrets
+     * Build Docker image
+     * Push image to Docker Hub with tag "latest"
+   
+   Using latest action versions:
+   - actions/checkout@v4
+   - docker/setup-buildx-action@v3
+   - docker/login-action@v3
+   - docker/build-push-action@v5
+
+2. Watchtower (Second Half - Auto-Deploy):
+   - Containerized service that monitors Docker Hub
+   - Polls every 30 seconds for image updates
+   - Automatically pulls new image when available
+   - Restarts container with new image
+   - Zero downtime - no manual intervention needed
+   - Configured in docker-compose.yaml with:
+     * WATCHTOWER_POLL_INTERVAL=30 (check every 30 seconds)
+     * WATCHTOWER_CLEANUP=true (remove old images)
+     * Volume: /var/run/docker.sock (access to Docker)
+
+3. Node.js/Express Application:
+   - Simple but functional API
+   - Endpoints: /, /api/version, /api/info, /health
+   - Runs on port 3000
+   - Lightweight: Node.js 20 Alpine base image
+   - Uses --production flag for smaller image
+
+SETUP REQUIREMENTS:
+
+To make the pipeline work:
+
+1. GitHub Secrets Configuration:
+   - DOCKER_USERNAME: Docker Hub username
+   - DOCKER_PASSWORD: Docker Hub access token (from Settings/Security)
+
+2. Docker Hub:
+   - Repository will be created automatically as: username/deployment-pipeline
+   - First push creates the repository
+   - Image is tagged as "latest" for Watchtower to track
+
+TESTING THE PIPELINE:
+
+The complete pipeline works like this:
+
+1. Developer makes code change (e.g., update version in index.js)
+2. Commit and push to main branch
+3. GitHub Actions workflow triggers automatically
+4. Workflow builds Docker image
+5. Image is pushed to Docker Hub with tag "latest"
+6. Watchtower (running locally) detects update
+7. Watchtower pulls new image from Docker Hub
+8. Watchtower stops old container and starts new one
+9. Changes are live without manual restart
+10. Verify with: curl http://localhost:3000/
+
+Complete workflow time:
+- GitHub Actions build: ~1-2 minutes
+- Watchtower poll interval: 30 seconds (max wait)
+- Total: 2-3 minutes from push to live deployment
+
+DOCKER COMPOSE CONFIGURATION:
+
+```yaml
+services:
+  app:
+    - Builds from Dockerfile
+    - Maps port 3000:3000
+    - NODE_ENV=production
+    - restart: unless-stopped (auto-restart on failure)
+  
+  watchtower:
+    - Uses containrrr/watchtower image
+    - Has access to Docker socket (/var/run/docker.sock)
+    - Polls every 30 seconds
+    - Auto-restarts the app container when new image is available
+```
+
+The two services together form the complete deployment pipeline:
+- app: The application being deployed
+- watchtower: The automatic deployment mechanism
+
+WORKFLOW FILE (.github/workflows/build.yml):
+
+- Triggers on: push to main branch
+- Uses latest Docker official actions (v3, v4, v5)
+- Logs in to Docker Hub using encrypted secrets
+- Builds image with tag: ${{ secrets.DOCKER_USERNAME }}/deployment-pipeline:latest
+- All steps are cacheable for faster builds
+
+KEY IMPLEMENTATION DETAILS:
+
+1. Two-Stage Pipeline:
+   First stage (GitHub): Build & push image to registry
+   Second stage (Watchtower): Pull new image & restart container
+   
+2. Zero-Downtime Deployment:
+   - New container is started before old one stops
+   - Connection handling ensures no requests are lost
+   - Graceful restart mechanism
+
+3. Automatic Updates:
+   - No manual SSH to server
+   - No manual container restart commands
+   - All automation through Watchtower
+   - Developer only needs to push code
+
+4. Security Considerations:
+   - Docker Hub credentials stored as GitHub secrets (encrypted)
+   - Watchtower needs Docker socket access (powerful, use carefully)
+   - In production: implement image scanning and verification
+   - Use specific tags instead of "latest" for better control
+
+BENEFITS OF THIS APPROACH:
+
+1. Developers focus on code, not deployment
+2. Every push to main automatically triggers deployment
+3. No manual steps needed for production release
+4. Consistent builds (built on GitHub Actions, not local machine)
+5. Complete transparency (all steps logged on GitHub)
+6. Easy to debug (all actions visible in Actions tab)
+7. Automatic cleanup (old images removed by Watchtower)
+
+PRODUCTION IMPROVEMENTS:
+
+While this exercise implements the basic pipeline, production would add:
+- Image scanning for vulnerabilities (Trivy, Snyk)
+- Staging environment before production
+- Integration tests before building image
+- Image signing and verification
+- Rollback mechanism for failed deployments
+- Health checks and monitoring
+- Multiple deployment targets
+- Specific version tags instead of "latest"
+- Approval workflows for production deployment
+
+TESTING THE COMPLETE PIPELINE:
+
+1. Make change to index.js (e.g., update message/version)
+2. Commit: git add . && git commit -m "Update message"
+3. Push: git push origin main
+4. Watch GitHub Actions: https://github.com/Merkuryo/devops-with-docker/actions
+5. Verify image on Docker Hub after GitHub Actions completes
+6. Wait for Watchtower to detect and pull new image (max 30 seconds)
+7. Test with: curl http://localhost:3000/
+8. Changes should be visible without manual restart
+
+TECHNOLOGIES USED:
+
+- GitHub Actions: CI/CD pipeline automation
+- Docker Buildx: Multi-platform image building
+- Docker Hub: Image registry and distribution
+- Watchtower: Automated container updates
+- Node.js 20 Alpine: Lightweight base image
+- Express.js: Web framework
+- Docker Compose: Service orchestration
+
+CONCLUSION:
+
+This exercise demonstrates a real-world CI/CD pipeline that:
+1. Automates the entire build-to-deployment process
+2. Eliminates manual deployment steps
+3. Ensures consistency across environments
+4. Reduces deployment time from minutes to seconds
+5. Decreases human error in production deployments
+
+The combination of GitHub Actions (build automation) and Watchtower (deployment automation) creates a fully automated DevOps workflow that scales from small projects to enterprise applications.

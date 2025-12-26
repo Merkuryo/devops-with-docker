@@ -48,6 +48,10 @@ Exercise 3.2 adds automated deployment via GitHub Actions. Every push to the mai
 - **2.10 Close Ports** ✓ - Port closure and security (only expose entry point)
 - **2.11 Your Dev Env** ✓ (Mandatory) - Containerized Node.js development environment with hot-reload
 
+#### Chapter 2: Docker Compose Optimization & CI/CD
+
+- **3.1 Your Pipeline** ✓ (Mandatory) - [GitHub Actions and Watchtower CI/CD deployment pipeline](part-2/chapter-2/exercises/3.1-your-pipeline/)
+
 #### Chapter 3: Security and Optimization
 
 - **3.1 Your Pipeline** ✓ (Mandatory) - [GitHub Actions and Watchtower CI/CD deployment pipeline](part-2/chapter-3/exercises/3.1-your-pipeline/)
@@ -113,6 +117,9 @@ Exercise 3.2 adds automated deployment via GitHub Actions. Every push to the mai
     │       ├── 2.9-fixup/
     │       ├── 2.10-close-ports/
     │       └── 2.11-your-dev-env/
+    ├── chapter-2/
+    │   └── exercises/
+    │       └── 3.1-your-pipeline/
     └── chapter-3/
         └── exercises/
             ├── 3.1-your-pipeline/
