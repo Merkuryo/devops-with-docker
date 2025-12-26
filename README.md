@@ -31,6 +31,7 @@ Repository containing solutions to exercises from the University of Helsinki's D
 
 - **2.1 Simple Service Writing to Log** ✓ - Docker Compose with volume binding for logs
 - **2.2 Simple Service with Browser** ✓ - Docker Compose with port mapping for web service
+- **2.3 Project with Compose** ✓ (Mandatory) - Docker Compose with frontend and backend
 
 ## Repository Structure
 

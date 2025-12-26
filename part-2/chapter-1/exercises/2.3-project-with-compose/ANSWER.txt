@@ -1,0 +1,135 @@
+## Exercise 2.3 - Project with Compose (Mandatory)
+
+### docker-compose.yaml
+
+```yaml
+services:
+  backend:
+    image: backend-app
+    build:
+      context: ../../../../../../tmp/material-applications/example-backend
+      dockerfile: Dockerfile
+    container_name: example-backend
+    ports:
+      - 8080:8080
+    environment:
+      - REQUEST_ORIGIN=http://localhost:5000
+
+  frontend:
+    image: frontend-app
+    build:
+      context: ../../../../../../tmp/material-applications/example-frontend
+      dockerfile: Dockerfile
+    container_name: example-frontend
+    ports:
+      - 5000:5000
+    environment:
+      - REACT_APP_BACKEND_URL=http://localhost:8080
+    depends_on:
+      - backend
+```
+
+### Running the Services
+
+```bash
+docker compose up
+```
+
+Wait for both services to start:
+- Backend will log: "Server running on port 8080"
+- Frontend will log: "Accepting connections at http://localhost:5000"
+
+### Testing the Setup
+
+**Test backend:**
+```bash
+curl http://localhost:8080/ping
+# Response: pong
+```
+
+**Access frontend in browser:**
+```
+http://localhost:5000
+```
+
+**Test Exercise 1.14 button:**
+- Open browser at http://localhost:5000
+- Find the button for Exercise 1.14
+- Click it
+- Button should turn GREEN if communication is successful
+
+### Stopping the Services
+
+```bash
+docker compose down
+```
+
+### Service Configuration Explained
+
+**Backend Service:**
+- Uses pre-built backend-app image
+- Builds from example-backend Dockerfile if image doesn't exist
+- Exposes port 8080
+- Sets REQUEST_ORIGIN to allow CORS from frontend
+
+**Frontend Service:**
+- Uses pre-built frontend-app image
+- Builds from example-frontend Dockerfile if image doesn't exist
+- Exposes port 5000
+- Sets REACT_APP_BACKEND_URL to backend location
+- Depends on backend service (starts backend first)
+
+### Why Docker Compose for Multi-container Apps?
+
+1. **Simplified Start** - One command instead of multiple docker run commands
+2. **Service Linking** - Services can communicate using service names
+3. **Environment Config** - All variables in one place
+4. **Dependency Management** - Control startup order with depends_on
+5. **Reproducibility** - Easy to share and replicate exact setup
+6. **Scalability** - Easy to add more services
+
+### Advantages Over Manual Docker Commands
+
+**Without Compose (complex):**
+```bash
+# Terminal 1
+docker build -t backend-app .
+docker run -p 8080:8080 -e REQUEST_ORIGIN=http://localhost:5000 backend-app
+
+# Terminal 2
+docker build -t frontend-app .
+docker run -p 5000:5000 -e REACT_APP_BACKEND_URL=http://localhost:8080 frontend-app
+```
+
+**With Compose (simple):**
+```bash
+docker compose up
+```
+
+### Environment Variables Explained
+
+**REQUEST_ORIGIN=http://localhost:5000:**
+- Backend checks this to allow cross-origin requests from frontend
+- Without this, CORS would block the request
+
+**REACT_APP_BACKEND_URL=http://localhost:8080:**
+- Frontend React app uses this to configure API endpoint
+- Built into the app during npm run build
+
+### Service Dependencies
+
+The `depends_on: - backend` ensures:
+1. Backend service starts before frontend
+2. Prevents frontend from starting before backend is ready
+3. More reliable startup sequence
+
+### Success Verification
+
+The exercise is complete when:
+- ✓ docker-compose.yaml exists with correct configuration
+- ✓ `docker compose up` starts both services
+- ✓ Both services are accessible (frontend on 5000, backend on 8080)
+- ✓ Backend responds to http://localhost:8080/ping
+- ✓ Frontend loads at http://localhost:5000
+- ✓ Exercise 1.14 button turns green when clicked
+- ✓ `docker compose down` stops all services
