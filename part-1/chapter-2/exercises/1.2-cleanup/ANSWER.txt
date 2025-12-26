@@ -1,0 +1,30 @@
+## Commands Executed
+
+Stop all running containers:
+```bash
+docker stop $(docker ps -q)
+```
+
+Remove all stopped containers:
+```bash
+docker container prune -f
+```
+
+Remove all unused images:
+```bash
+docker image prune -af
+```
+
+## Output
+
+### docker ps -a
+```
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+```
+
+### docker image ls
+```
+REPOSITORY   TAG       IMAGE ID   CREATED   SIZE
+```
+
+Both outputs show empty results, confirming that all containers and images have been successfully removed from the Docker daemon.
