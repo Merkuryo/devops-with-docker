@@ -1,0 +1,22 @@
+FROM node:16-alpine
+
+WORKDIR /usr/src/app
+
+# Combine RUN commands and remove build cache
+RUN apk add --no-cache dumb-init && \
+    addgroup -S appgroup && \
+    adduser -S appuser -G appgroup
+
+COPY . .
+
+# Combine npm commands and remove cache
+RUN npm install --production && \
+    npm cache clean --force && \
+    chown -R appuser:appgroup /usr/src/app
+
+USER appuser
+
+EXPOSE 5000
+
+ENTRYPOINT ["dumb-init", "--"]
+CMD ["npm", "start"]

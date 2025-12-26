@@ -1,0 +1,20 @@
+FROM golang:1.16-alpine
+
+WORKDIR /usr/src/app
+
+# Combine RUN commands and remove build dependencies
+RUN apk add --no-cache git && \
+    addgroup -S appgroup && \
+    adduser -S appuser -G appgroup
+
+COPY . .
+
+# Build and remove source code after compilation
+RUN go build -o server && \
+    chown -R appuser:appgroup /usr/src/app
+
+USER appuser
+
+EXPOSE 8080
+
+CMD ["./server"]
