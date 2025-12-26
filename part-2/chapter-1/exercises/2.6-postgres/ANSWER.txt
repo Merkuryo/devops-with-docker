@@ -1,0 +1,130 @@
+## Exercise 2.6 - Postgres (Mandatory)
+
+### docker-compose.yaml Configuration
+
+The solution adds a PostgreSQL service to the Exercise 2.4 setup:
+
+**Key additions:**
+
+1. **PostgreSQL Service:**
+```yaml
+db:
+  image: postgres:17
+  restart: unless-stopped
+  environment:
+    POSTGRES_PASSWORD: postgres
+    POSTGRES_USER: postgres
+    POSTGRES_DB: postgres
+  container_name: db_postgres
+  volumes:
+    - database:/var/lib/postgresql/data
+```
+
+2. **Backend PostgreSQL Variables:**
+```yaml
+environment:
+  - POSTGRES_HOST=db
+  - POSTGRES_USER=postgres
+  - POSTGRES_PASSWORD=postgres
+  - POSTGRES_DATABASE=postgres
+```
+
+3. **Backend Dependencies:**
+```yaml
+depends_on:
+  - redis
+  - db
+```
+
+4. **Docker Managed Volume:**
+```yaml
+volumes:
+  database:
+```
+
+### How It Works
+
+1. PostgreSQL starts first (via depends_on)
+2. Backend connects using POSTGRES_HOST=db (Docker DNS)
+3. Backend creates tables and initializes database
+4. Frontend can send messages through backend
+5. Messages are stored in PostgreSQL (persistent)
+6. Data survives container restarts
+
+### What Changed from 2.4
+
+Added PostgreSQL database to persist messages. Exercise 2.4 used only Redis (volatile cache). Now both are used:
+- Redis: Fast in-memory access
+- PostgreSQL: Persistent storage
+
+### Running
+
+```bash
+docker compose up
+```
+
+Access at http://localhost:5000
+
+### Verification
+
+Check backend logs for PostgreSQL connection:
+```bash
+docker compose logs backend | grep postgres
+```
+
+Should see:
+```
+[Ex 2.6+] Connection to postgres initialized, ready to ping pong.
+```
+
+### Database Access
+
+Connect to PostgreSQL directly:
+```bash
+docker compose exec db_postgres psql -U postgres
+```
+
+List messages table:
+```sql
+\dt
+SELECT * FROM messages;
+```
+
+### Volume Information
+
+Docker managed volume automatically created:
+- Name: `26-postgres_database`
+- Location: `/var/lib/docker/volumes/26-postgres_database/_data`
+- Persists across restarts
+
+Clean up if needed:
+```bash
+docker volume rm 26-postgres_database
+```
+
+### Environment Variables Explained
+
+From backend README (exercise 2.6 and after):
+- `POSTGRES_HOST` - Hostname (default: db)
+- `POSTGRES_USER` - Database user (default: postgres)
+- `POSTGRES_PASSWORD` - Database password (default: postgres)
+- `POSTGRES_DATABASE` - Database name (default: postgres)
+
+All match PostgreSQL service configuration for seamless connection.
+
+### Success Indicators
+
+✓ All containers running (frontend, backend, redis, postgres)
+✓ Frontend accessible at http://localhost:5000
+✓ Backend logs show successful PostgreSQL connection
+✓ Can submit form and view messages
+✓ Messages persist across container restarts
+✓ `docker compose ps` shows all 4 services
+
+### Key Concepts
+
+- **Docker Managed Volumes** - Automatic volume management
+- **Service Networking** - Service names resolve via DNS
+- **Restart Policy** - `unless-stopped` handles temporary failures
+- **Dependencies** - Ensures correct startup order
+- **Environment Variables** - Configures service connections
