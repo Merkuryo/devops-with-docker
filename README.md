@@ -48,17 +48,17 @@ Exercise 3.2 adds automated deployment via GitHub Actions. Every push to the mai
 - **2.10 Close Ports** ✓ - Port closure and security (only expose entry point)
 - **2.11 Your Dev Env** ✓ (Mandatory) - Containerized Node.js development environment with hot-reload
 
-#### Chapter 2: Security and Optimization
+#### Chapter 3: Security and Optimization
 
-- **3.1 Your Pipeline** ✓ (Mandatory) - GitHub Actions and Watchtower CI/CD deployment pipeline
-- **3.2 Cloud Deployment** ✓ (Mandatory) - Automated deployment pipeline to Render.com cloud service
+- **3.1 Your Pipeline** ✓ (Mandatory) - [GitHub Actions and Watchtower CI/CD deployment pipeline](part-2/chapter-3/exercises/3.1-your-pipeline/)
+- **3.2 Cloud Deployment** ✓ (Mandatory) - [Automated deployment pipeline to Render.com cloud service](part-2/chapter-3/exercises/3.2-cloud-deployment/) | [Live App](https://devops-with-docker-vzjv.onrender.com)
 
 ## Statistics
 
 - **Total Exercises Completed:** 29/29
   - Part 1: 16/16 exercises ✓
   - Part 2, Chapter 1: 11/11 exercises ✓
-  - Part 2, Chapter 2: 2/2 exercises ✓
+  - Part 2, Chapter 3: 2/2 exercises ✓
 
 - **Technologies Mastered:**
   - Docker containers and images
@@ -113,7 +113,7 @@ Exercise 3.2 adds automated deployment via GitHub Actions. Every push to the mai
     │       ├── 2.9-fixup/
     │       ├── 2.10-close-ports/
     │       └── 2.11-your-dev-env/
-    └── chapter-2/
+    └── chapter-3/
         └── exercises/
             ├── 3.1-your-pipeline/
             └── 3.2-cloud-deployment/
