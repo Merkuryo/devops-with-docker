@@ -1,0 +1,112 @@
+## Exercise 2.10 - Close the Ports
+
+### Change Made
+
+**Removed port mappings** from frontend and backend services. Only kept port 80 exposed on the Nginx reverse proxy.
+
+### docker-compose.yaml Changes
+
+**Before (had unnecessary port mappings):**
+```yaml
+frontend:
+  ports:
+    - 5000:5000  # Exposed but shouldn't be
+
+backend:
+  ports:
+    - 8080:8080  # Exposed but shouldn't be
+```
+
+**After (clean - only proxy port exposed):**
+```yaml
+proxy:
+  ports:
+    - 80:80  # Only entry point
+  
+frontend:
+  # No ports - internal only
+  
+backend:
+  # No ports - internal only
+```
+
+### Why This Works
+
+Even without exposing ports, containers communicate internally:
+- `http://frontend:5000` works from Nginx (same Docker network)
+- `http://backend:8080` works from Nginx (same Docker network)
+- Service names resolve automatically via Docker DNS
+
+Only the Nginx reverse proxy needs to expose a port (80) for external access.
+
+### Port Exposure Summary
+
+| Service | Exposed | Accessible From |
+|---------|---------|-----------------|
+| Nginx | Port 80 | Host (http://localhost/) |
+| Frontend | None | Only via Nginx |
+| Backend | None | Only via Nginx |
+| Redis | None | Only containers |
+| PostgreSQL | None | Only containers |
+
+### Verification with nmap
+
+```bash
+docker run -it --rm --network host networkstatic/nmap localhost
+```
+
+Shows only port 80 (and system service 111):
+```
+PORT     STATE    SERVICE
+80/tcp   filtered http
+111/tcp  open     rpcbind
+```
+
+No ports 5000 or 8080 visible anymore!
+
+### How Traffic Flows
+
+1. User browser → http://localhost:80 (Nginx)
+2. Nginx → http://frontend:5000/ (internal routing)
+3. Nginx → http://backend:8080/ (internal routing)
+
+All communication is managed by the reverse proxy.
+
+### Docker Networking Concept
+
+**Port mapping** (`ports:` in compose or `-p` flag) is ONLY for:
+- Exposing container ports to the HOST/outside world
+- Making services accessible from machines outside Docker
+
+**Internal communication** (container-to-container):
+- Uses service names in the same Docker network
+- No port mapping needed
+- Automatic DNS resolution
+
+### Security Benefit
+
+- Direct access to backend prevented: `http://localhost:8080` no longer works
+- All requests routed through Nginx for verification
+- Reduces attack surface
+- Clean API boundaries
+
+### Testing
+
+All functionality still works through port 80:
+```bash
+curl http://localhost/api/ping          # Works
+curl http://localhost/                  # Works
+curl http://localhost/api/messages      # Works
+curl http://localhost:8080/ping         # Fails (not exposed)
+curl http://localhost:5000/             # Fails (not exposed)
+```
+
+### Key Lesson
+
+Don't expose ports just because they exist inside containers. Only expose what needs external access. Everything else communicates internally using Docker's networking and DNS.
+
+This is:
+- More secure
+- Cleaner architecture
+- Follows best practices
+- Enables easy internal changes without affecting external API
