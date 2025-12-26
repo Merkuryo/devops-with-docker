@@ -41,11 +41,16 @@ Repository containing solutions to exercises from the University of Helsinki's D
 - **2.10 Close Ports** ✓ - Port closure and security (only expose entry point)
 - **2.11 Your Dev Env** ✓ (Mandatory) - Containerized Node.js development environment with hot-reload
 
+#### Chapter 2: Security and Optimization
+
+- **3.1 Your Pipeline** ✓ (Mandatory) - GitHub Actions and Watchtower CI/CD deployment pipeline
+
 ## Statistics
 
-- **Total Exercises Completed:** 27/27
+- **Total Exercises Completed:** 28/28
   - Part 1: 16/16 exercises ✓
   - Part 2, Chapter 1: 11/11 exercises ✓
+  - Part 2, Chapter 2: 1/1 exercises ✓
 
 - **Technologies Mastered:**
   - Docker containers and images
@@ -58,6 +63,9 @@ Repository containing solutions to exercises from the University of Helsinki's D
   - Caching layers (Redis)
   - Containerized development environments with hot-reload
   - Cloud deployment (Render.com)
+  - CI/CD pipelines with GitHub Actions
+  - Automated image building and pushing
+  - Automatic container updates with Watchtower
 
 ## Repository Structure
 
@@ -84,19 +92,22 @@ Repository containing solutions to exercises from the University of Helsinki's D
 │           ├── 1.15-homework/
 │           └── 1.16-cloud-deployment/
 └── part-2/
-    └── chapter-1/
+    ├── chapter-1/
+    │   └── exercises/
+    │       ├── 2.1-simple-service/
+    │       ├── 2.2-service-with-browser/
+    │       ├── 2.3-project-with-compose/
+    │       ├── 2.4-redis/
+    │       ├── 2.5-scale/
+    │       ├── 2.6-postgres/
+    │       ├── 2.7-bind-mount/
+    │       ├── 2.8-reverse-proxy/
+    │       ├── 2.9-fixup/
+    │       ├── 2.10-close-ports/
+    │       └── 2.11-your-dev-env/
+    └── chapter-2/
         └── exercises/
-            ├── 2.1-simple-service/
-            ├── 2.2-service-with-browser/
-            ├── 2.3-project-with-compose/
-            ├── 2.4-redis/
-            ├── 2.5-scale/
-            ├── 2.6-postgres/
-            ├── 2.7-bind-mount/
-            ├── 2.8-reverse-proxy/
-            ├── 2.9-fixup/
-            ├── 2.10-close-ports/
-            └── 2.11-your-dev-env/
+            └── 3.1-your-pipeline/
 ```
 
 ## About This Course
@@ -111,6 +122,8 @@ The DevOps with Docker course from the University of Helsinki covers containeriz
 - Network configuration and service communication
 - Development environment containerization
 - Infrastructure as code principles
+- CI/CD automation and deployment pipelines
+- Container security and optimization best practices
 
 - **Official Course:** https://docker-esa.dev/
 - **Docker Documentation:** https://docs.docker.com/
