@@ -1,0 +1,31 @@
+## Commands to Start the Container and Fix the Problem
+
+### 1. Start the Ubuntu container with the website-checking script:
+
+```bash
+docker run -d -it --name website-checker ubuntu sh -c 'while true; do echo "Input website:"; read website; echo "Searching.."; sleep 1; curl http://$website; done'
+```
+
+**Note:** On Windows with CMD, use double quotes instead of single quotes:
+```bash
+docker run -d -it --name website-checker ubuntu sh -c "while true; do echo 'Input website:'; read website; echo 'Searching..'; sleep 1; curl http://$website; done"
+```
+
+### 2. Install curl inside the running container:
+
+```bash
+docker exec -it website-checker bash -c 'apt-get update && apt-get install -y curl'
+```
+
+## Explanation
+
+The script initially fails with "curl: not found" because curl is not installed in the base Ubuntu image. By executing:
+
+1. `apt-get update` - Updates the package list
+2. `apt-get install -y curl` - Installs curl with the `-y` flag to automatically confirm the installation
+
+After these commands, curl is available in the container and the script works correctly to fetch HTML content from websites.
+
+## Result
+
+Once curl is installed, the script can successfully make HTTP requests and display website content, as shown in the HTML response from the website.
