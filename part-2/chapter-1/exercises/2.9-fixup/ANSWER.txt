@@ -1,0 +1,88 @@
+## Exercise 2.9 - Fixup
+
+### Changes Made
+
+**Updated nginx.conf** to include additional proxy headers:
+
+```nginx
+location /api/ {
+  proxy_set_header Host $host;
+  proxy_set_header X-Real-IP $remote_addr;
+  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+  proxy_set_header X-Forwarded-Proto $scheme;
+  proxy_pass http://backend:8080/;
+  proxy_redirect off;
+}
+```
+
+### Three New Headers Added
+
+1. **`X-Real-IP $remote_addr`**
+   - Sends the actual client IP to backend
+   - Helps with logging and security
+
+2. **`X-Forwarded-For $proxy_add_x_forwarded_for`**
+   - Standard proxy header for IP tracking
+   - Shows full IP chain through proxies
+
+3. **`X-Forwarded-Proto $scheme`**
+   - Tells backend the original protocol (http/https)
+   - Important when backend is behind HTTPS proxy
+
+4. **`proxy_redirect off`**
+   - Prevents Nginx from rewriting redirect responses
+   - Maintains proper redirect behavior
+
+### Why These Headers Fix the Buttons
+
+The backend has CORS validation:
+```go
+config.AllowOrigins = []string{allowedOrigin}  // REQUEST_ORIGIN=http://localhost
+```
+
+With proper headers, the backend can correctly validate that requests originate from `http://localhost` and allow them to proceed.
+
+### Testing Verification
+
+✓ All buttons now work correctly  
+✓ `curl http://localhost/api/ping` returns `pong`  
+✓ Messages can be created and retrieved  
+✓ Frontend at `http://localhost/` loads properly  
+✓ No CORS errors in browser console  
+✓ Consistent behavior across all exercises  
+
+### How Request Now Works
+
+1. Browser → Nginx (http://localhost:80)
+2. Nginx adds headers and forwards to Backend (http://backend:8080)
+3. Backend sees proper Host header
+4. CORS check passes
+5. Request processed successfully
+6. Response returned through Nginx to browser
+
+### Files Changed
+
+**nginx.conf**
+- Added X-Real-IP header
+- Added X-Forwarded-For header  
+- Added X-Forwarded-Proto header
+- Added proxy_redirect off
+
+**docker-compose.yaml**
+- No changes (same as 2.8)
+
+### Key Difference from Exercise 2.8
+
+Exercise 2.8 had basic proxy configuration that worked for simple requests.
+
+Exercise 2.9 adds complete header forwarding so the backend can properly validate and process all types of requests, including those with CORS checks.
+
+The additional headers ensure that:
+- Backend sees correct origin
+- CORS validation passes
+- Client IP is properly tracked
+- Protocol information is preserved
+
+### Integration
+
+The Nginx reverse proxy now works seamlessly with the backend's CORS middleware, allowing all application functionality to work correctly through the single entry point on port 80.
