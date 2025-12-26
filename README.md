@@ -56,13 +56,14 @@ Exercise 3.2 adds automated deployment via GitHub Actions. Every push to the mai
 
 - **3.1 Your Pipeline** ✓ (Mandatory) - [GitHub Actions and Watchtower CI/CD deployment pipeline](part-2/chapter-3/exercises/3.1-your-pipeline/)
 - **3.2 Cloud Deployment** ✓ (Mandatory) - [Automated deployment pipeline to Render.com cloud service](part-2/chapter-3/exercises/3.2-cloud-deployment/) | [Live App](https://devops-with-docker-vzjv.onrender.com)
+- **3.3 Scripting Magic** ✓ - [Automated shell script for Docker build and push workflow](part-2/chapter-3/exercises/3.3-scripting-magic/)
 
 ## Statistics
 
-- **Total Exercises Completed:** 29/29
+- **Total Exercises Completed:** 30/30
   - Part 1: 16/16 exercises ✓
   - Part 2, Chapter 1: 11/11 exercises ✓
-  - Part 2, Chapter 3: 2/2 exercises ✓
+  - Part 2, Chapter 3: 3/3 exercises ✓
 
 - **Technologies Mastered:**
   - Docker containers and images
@@ -78,6 +79,7 @@ Exercise 3.2 adds automated deployment via GitHub Actions. Every push to the mai
   - CI/CD pipelines with GitHub Actions
   - Automated image building and pushing
   - Automatic container updates with Watchtower
+  - Shell scripting and automation
 
 ## Repository Structure
 
@@ -123,7 +125,8 @@ Exercise 3.2 adds automated deployment via GitHub Actions. Every push to the mai
     └── chapter-3/
         └── exercises/
             ├── 3.1-your-pipeline/
-            └── 3.2-cloud-deployment/
+            ├── 3.2-cloud-deployment/
+            └── 3.3-scripting-magic/
 ```
 
 ## About This Course
