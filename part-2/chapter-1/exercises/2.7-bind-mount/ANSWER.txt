@@ -1,0 +1,153 @@
+## Exercise 2.7 - Bind Mount (Mandatory)
+
+### Main Change: Bind Mount Instead of Managed Volume
+
+Changed the PostgreSQL volume from Docker managed to bind mount:
+
+**Before (2.6):**
+```yaml
+volumes:
+  database:
+
+services:
+  db:
+    volumes:
+      - database:/var/lib/postgresql/data
+```
+
+**Now (2.7):**
+```yaml
+services:
+  db:
+    volumes:
+      - ./database:/var/lib/postgresql/data
+```
+
+### How It Works
+
+- PostgreSQL data is stored in `./database` directory (relative to docker-compose.yaml)
+- Data persists between `docker compose down` and `docker compose up`
+- Deleting `./database` removes all data
+- Host can directly access database files (with proper permissions)
+
+### docker-compose.yaml Structure
+
+Same as 2.6 except for the volumes section. The key changes:
+
+1. **PostgreSQL service** now has:
+   ```yaml
+   volumes:
+     - ./database:/var/lib/postgresql/data
+   ```
+
+2. **Removed** the `volumes:` section at bottom (no managed volume declaration)
+
+### Testing Performed
+
+**Step 1: Persistence Test**
+- Started services
+- Saved test messages to database
+- Ran `docker compose down`
+- Ran `docker compose up`
+- ✓ Messages were still there
+
+**Step 2: Data Deletion Test**
+- Ran `docker compose down`
+- Deleted `./database` directory
+- Ran `docker compose up`
+- ✓ Database was fresh, old messages gone
+
+### Bind Mount vs Managed Volume
+
+**Bind Mount (2.7):**
+- Data location: `./database` (visible directory)
+- Easy to backup (just copy folder)
+- Direct file access on host
+- Good for development
+
+**Managed Volume (2.6):**
+- Data location: `/var/lib/docker/volumes/...` (Docker manages)
+- Docker handles lifecycle
+- More secure by default
+- Better for production
+
+### Key Differences in Practice
+
+1. **Visibility:**
+   - Bind mount: `ls -la database/` (with sudo)
+   - Managed: `docker volume ls | grep database`
+
+2. **Backup:**
+   - Bind mount: `cp -r database backup/`
+   - Managed: `docker container cp container:/path backup/`
+
+3. **Cleanup:**
+   - Bind mount: `rm -rf database`
+   - Managed: `docker volume rm name`
+
+### Important Notes
+
+- Directory `./database` is created automatically on first `docker compose up`
+- PostgreSQL sets restrictive permissions (only accessible as root)
+- This is normal and secure - don't change permissions
+- Use `sudo` to view directory contents
+
+### Verification Commands
+
+Check if bind mount is working:
+```bash
+ls -la database/
+```
+Permission denied is OK - shows bind mount is active.
+
+With elevated privileges:
+```bash
+sudo ls -la database/
+```
+Shows all PostgreSQL data files (base/, global/, pg_hba.conf, etc.)
+
+### Backend Connection
+
+Backend configuration unchanged - still uses:
+```yaml
+environment:
+  - POSTGRES_HOST=db
+  - POSTGRES_USER=postgres
+  - POSTGRES_PASSWORD=postgres
+  - POSTGRES_DATABASE=postgres
+```
+
+Only storage method changed, not connection method.
+
+### All Services Still Functional
+
+- Frontend on port 5000
+- Backend on port 8080
+- Redis for caching (internal)
+- PostgreSQL for persistence (internal, now bind mount)
+
+Button turns green confirming everything works.
+
+### When to Use Bind Mount
+
+**Good for:**
+- Development environments
+- Local testing
+- Learning Docker volumes
+- Situations where host visibility needed
+
+**Not recommended for:**
+- Production (prefer managed volumes or cloud DB)
+- Shared hosting
+- High-concurrency scenarios
+- When portability matters
+
+### Integration Complete
+
+Exercise 2.7 successfully replaces Docker managed volumes with bind mounts while maintaining:
+- ✓ Full backend functionality
+- ✓ Frontend connectivity
+- ✓ Message persistence
+- ✓ All service communication
+
+This demonstrates understanding of different volume mounting strategies in Docker Compose.
