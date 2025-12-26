@@ -22,6 +22,7 @@ Repository containing solutions to exercises from the University of Helsinki's D
 - **1.12 Hello Frontend** ✓ (Mandatory) - Containerizing a React frontend application
 - **1.13 Hello Backend** ✓ (Mandatory) - Containerizing a Go backend application
 - **1.14 Environment** ✓ (Mandatory) - Configuring frontend-backend communication with environment variables
+- **1.15 Homework** ✓ (Mandatory) - Publishing a custom application to Docker Hub
 
 ## Repository Structure
 

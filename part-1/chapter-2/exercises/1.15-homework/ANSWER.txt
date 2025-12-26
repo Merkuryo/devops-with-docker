@@ -1,0 +1,114 @@
+## Exercise 1.15 - Homework (Mandatory)
+
+### Project: Temperature Converter
+
+A command-line temperature converter application written in Python that converts between Celsius, Fahrenheit, and Kelvin.
+
+### Dockerfile
+
+```dockerfile
+FROM python:3.10-slim
+
+WORKDIR /app
+
+COPY app.py .
+
+RUN chmod +x app.py
+
+ENTRYPOINT ["python3", "app.py"]
+```
+
+### Building the Image
+
+```bash
+docker build -t temperature-converter .
+```
+
+### Pushing to Docker Hub
+
+1. Tag the image with your Docker Hub username:
+```bash
+docker tag temperature-converter <username>/temperature-converter
+```
+
+2. Login to Docker Hub:
+```bash
+docker login
+```
+
+3. Push the image:
+```bash
+docker push <username>/temperature-converter
+```
+
+### Running the Container
+
+Interactive mode (requires terminal):
+```bash
+docker run -it <username>/temperature-converter
+```
+
+Batch mode (with piped input):
+```bash
+echo -e "1\n25" | docker run -i <username>/temperature-converter
+```
+
+### Application Features
+
+The application converts between:
+- Celsius ↔ Fahrenheit
+- Celsius ↔ Kelvin
+- Fahrenheit ↔ Kelvin
+
+### Docker Hub Repository Setup
+
+The Docker Hub repository should include:
+
+**Repository name:** `temperature-converter`
+
+**Description:** 
+"A simple command-line temperature converter application. Converts between Celsius, Fahrenheit, and Kelvin. Supports both interactive and batch modes for easy integration."
+
+**Instructions:**
+```
+Run the container:
+docker run -it <username>/temperature-converter
+
+Example:
+echo -e "1\n25" | docker run -i <username>/temperature-converter
+Output: 25.0°C = 77.00°F
+```
+
+### Key Points
+
+- **Base Image:** `python:3.10-slim` - Lightweight Python image
+- **Working Directory:** `/app` - Application directory in container
+- **Entry Point:** Direct Python script execution
+- **Port:** No ports exposed (command-line application)
+- **Input:** Supports both interactive (-it flags) and piped input (-i flag)
+
+### Success Criteria Met
+
+- ✓ Original application created (not a fork/clone)
+- ✓ Dockerfile created and tested
+- ✓ Image builds successfully
+- ✓ Application runs without errors in Docker
+- ✓ Ready to be pushed to Docker Hub
+- ✓ Documentation includes usage instructions
+
+### Docker Hub Link
+
+`username/temperature-converter`
+
+Replace `username` with your Docker Hub username after pushing the image.
+
+## Explanation
+
+This homework exercise demonstrates:
+- Creating a Dockerfile for a custom application
+- Understanding image building and tagging
+- Proper documentation for Docker Hub
+- Publishing and sharing container images
+- Making applications portable through containerization
+
+The Temperature Converter is a simple but functional application that showcases how to containerize a Python CLI tool and make it accessible to others through Docker Hub.
