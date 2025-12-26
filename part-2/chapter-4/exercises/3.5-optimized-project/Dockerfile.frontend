@@ -1,0 +1,22 @@
+FROM node:16
+
+WORKDIR /usr/src/app
+
+COPY . .
+
+RUN npm install && npm run build
+
+RUN npm install -g serve
+
+# Create non-root user
+RUN useradd -m appuser
+
+# Change ownership of working directory
+RUN chown -R appuser:appuser /usr/src/app
+
+# Switch to non-root user
+USER appuser
+
+EXPOSE 5000
+
+CMD ["serve", "-s", "-l", "5000", "build"]

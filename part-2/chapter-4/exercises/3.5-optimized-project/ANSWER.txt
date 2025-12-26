@@ -1,0 +1,278 @@
+# Exercise 3.5: Optimized Project - Solution
+
+## Task
+
+Secure the frontend (1.12) and backend (1.13) applications by implementing non-root user execution to mitigate security risks from container escape vulnerabilities.
+
+## Solution: Frontend Dockerfile (Node.js)
+
+```dockerfile
+FROM node:16
+
+WORKDIR /usr/src/app
+
+COPY . .
+
+RUN npm install && npm run build
+
+RUN npm install -g serve
+
+# Create non-root user
+RUN useradd -m appuser
+
+# Change ownership of working directory
+RUN chown -R appuser:appuser /usr/src/app
+
+# Switch to non-root user
+USER appuser
+
+EXPOSE 5000
+
+CMD ["serve", "-s", "-l", "5000", "build"]
+```
+
+**Changes from original:**
+- Line 13-14: Creates appuser with home directory
+- Line 16-17: Changes directory ownership to appuser
+- Line 19-20: Switches execution context to appuser
+- Lines 23-25: Run as non-root user
+
+## Solution: Backend Dockerfile (Alpine/Go)
+
+```dockerfile
+FROM golang:1.16
+
+WORKDIR /usr/src/app
+
+COPY . .
+
+RUN go build
+
+# Create non-root user (Alpine Linux uses addgroup and adduser)
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+
+# Change ownership of working directory
+RUN chown -R appuser:appgroup /usr/src/app
+
+# Switch to non-root user
+USER appuser
+
+EXPOSE 8080
+
+CMD ["./server"]
+```
+
+**Changes from original:**
+- Line 11: Creates system group (Alpine specific)
+- Line 12: Creates system user in group (Alpine specific)
+- Line 14-15: Changes directory ownership
+- Line 17-18: Switches to non-root user
+- Lines 20-22: Run as non-root user
+
+## Key Differences: Alpine vs Debian
+
+### Debian/Ubuntu (Node image)
+```bash
+useradd -m appuser
+```
+- Standard Linux user creation
+- `-m` creates home directory
+- Simple, direct syntax
+
+### Alpine Linux (Go image)
+```bash
+addgroup -S appgroup
+adduser -S appuser -G appgroup
+```
+- Alpine doesn't include GNU coreutils
+- Uses BusyBox `addgroup` and `adduser`
+- `-S` flag creates system user (UID < 1000)
+- `-G` flag specifies group membership
+
+## Implementation Details
+
+### User Creation Flags
+
+| Flag | Meaning | Usage |
+|------|---------|-------|
+| `-m` | Create home directory | `useradd -m appuser` |
+| `-S` | System user (low UID) | Alpine: `adduser -S appuser` |
+| `-G` | Primary group | Alpine: `adduser -S user -G group` |
+
+### Permission Commands
+
+```bash
+# Change ownership of directory
+chown -R appuser:appuser /usr/src/app
+# Format: chown -R user:group /path
+# -R = recursive (includes subdirectories)
+```
+
+### USER Directive
+
+```dockerfile
+USER appuser
+# All commands after this run as appuser
+# Includes: RUN, CMD, ENTRYPOINT
+# Does not affect docker exec or docker run with -u flag
+```
+
+## Execution Flow
+
+### Before (Root Execution)
+```
+Container Start
+    ↓
+Process runs as root (UID 0)
+    ↓
+Full system access if escaped
+```
+
+### After (Non-Root Execution)
+```
+Container Start
+    ↓
+appuser created (UID > 1000)
+    ↓
+Directory ownership changed to appuser
+    ↓
+USER appuser directive
+    ↓
+Process runs as appuser
+    ↓
+Limited system access if escaped
+```
+
+## Security Impact
+
+### Vulnerability Scenario
+
+**Before:**
+```
+Process vulnerability exploited
+    ↓
+Container escapes to host
+    ↓
+Running as root (UID 0)
+    ↓
+Complete host compromise
+```
+
+**After:**
+```
+Process vulnerability exploited
+    ↓
+Container escapes to host
+    ↓
+Running as appuser (UID ~1000)
+    ↓
+Limited host access
+```
+
+## Testing & Verification
+
+### Verify User in Image
+
+```bash
+# Build images
+docker build -f Dockerfile.frontend -t frontend-secure .
+docker build -f Dockerfile.backend -t backend-secure .
+
+# Check running user
+docker run frontend-secure whoami
+# Output: appuser
+
+docker run backend-secure whoami
+# Output: appuser
+
+# Verify UID
+docker run frontend-secure id
+# Output: uid=1000(appuser) gid=1000(appuser) groups=1000(appuser)
+```
+
+### Alpine-specific Test
+
+```bash
+# Check user in Alpine image
+docker run backend-secure id
+# Output: uid=1000(appuser) gid=1001(appgroup) groups=1001(appgroup)
+
+# Verify cannot write as root (user separation works)
+docker run --user 0 backend-secure touch /test
+# May fail or show permission issues
+```
+
+## Important Considerations
+
+### If Application Needs to Write Files
+
+If the application needs to write to the working directory:
+
+```dockerfile
+# Make directory writable by appuser
+RUN mkdir -p /usr/src/app && chown -R appuser:appuser /usr/src/app
+
+# Or use volume mount
+# docker run -v /host/path:/usr/src/app frontend-secure
+```
+
+### Environment Variables
+
+Non-root users have same environment variable access:
+```dockerfile
+ENV NODE_ENV=production
+USER appuser
+# appuser sees NODE_ENV=production
+```
+
+### Port Binding
+
+Non-root users can bind to unprivileged ports (>1024):
+```dockerfile
+EXPOSE 5000    # ✅ Works as non-root
+EXPOSE 80      # ❌ Fails as non-root (privileged port)
+```
+
+To use port 80, either:
+- Run container as root (defeats purpose)
+- Use port 8080 and expose as 80 in docker run
+- Use CAP_NET_BIND_SERVICE capability
+
+## Compliance & Standards
+
+This approach follows:
+- **CIS Docker Benchmark**: Ensure containers run as non-root
+- **OWASP**: Principle of least privilege
+- **Kubernetes**: Non-root requirement for restricted pod security policy
+- **Docker Best Practices**: Default to unprivileged execution
+
+## Comparison with Alternative Solutions
+
+### User Namespaces Remapping
+
+Alternative: Map root in container to unprivileged user on host
+```bash
+# /etc/docker/daemon.json
+{
+  "userns-remap": "default"
+}
+```
+
+**Pros:** Works with existing images, no Dockerfile changes  
+**Cons:** Requires host configuration, less explicit
+
+### Our Approach
+
+**Pros:** Explicit, portable, works everywhere  
+**Cons:** Requires Dockerfile modifications
+
+## Summary
+
+The solution implements industry-standard security hardening by:
+1. Creating dedicated non-root user for application
+2. Changing directory ownership before switching user
+3. Using platform-specific commands (Alpine vs Debian)
+4. Following principle of least privilege
+5. Maintaining application functionality while reducing attack surface
+
+This is a mandatory practice for production web services accessible over the network.

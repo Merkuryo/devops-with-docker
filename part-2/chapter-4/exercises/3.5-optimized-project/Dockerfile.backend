@@ -1,0 +1,20 @@
+FROM golang:1.16
+
+WORKDIR /usr/src/app
+
+COPY . .
+
+RUN go build
+
+# Create non-root user (Alpine Linux uses addgroup and adduser)
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+
+# Change ownership of working directory
+RUN chown -R appuser:appgroup /usr/src/app
+
+# Switch to non-root user
+USER appuser
+
+EXPOSE 8080
+
+CMD ["./server"]

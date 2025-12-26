@@ -59,12 +59,17 @@ Exercise 3.2 adds automated deployment via GitHub Actions. Every push to the mai
 - **3.3 Scripting Magic** ✓ - [Automated shell script for Docker build and push workflow](part-2/chapter-3/exercises/3.3-scripting-magic/)
 - **3.4 Building Images Inside Container** ✓ - [Dockerized builder with docker.sock and environment-based authentication](part-2/chapter-3/exercises/3.4-building-images-inside-container/)
 
+#### Chapter 4: Security and Optimization
+
+- **3.5 Optimized Project** ✓ (Mandatory) - [Non-root user security hardening for frontend and backend](part-2/chapter-4/exercises/3.5-optimized-project/)
+
 ## Statistics
 
-- **Total Exercises Completed:** 31/31
+- **Total Exercises Completed:** 32/32
   - Part 1: 16/16 exercises ✓
   - Part 2, Chapter 1: 11/11 exercises ✓
   - Part 2, Chapter 3: 4/4 exercises ✓
+  - Part 2, Chapter 4: 1/1 exercise ✓
 
 - **Technologies Mastered:**
   - Docker containers and images
@@ -83,6 +88,8 @@ Exercise 3.2 adds automated deployment via GitHub Actions. Every push to the mai
   - Shell scripting and automation
   - Docker-in-Docker (DinD) patterns
   - Socket mounting for inter-process communication
+  - Container security hardening (non-root users)
+  - Linux user management (Debian vs Alpine)
 
 ## Repository Structure
 
@@ -131,6 +138,10 @@ Exercise 3.2 adds automated deployment via GitHub Actions. Every push to the mai
             ├── 3.2-cloud-deployment/
             ├── 3.3-scripting-magic/
             └── 3.4-building-images-inside-container/
+└── part-3/
+    └── chapter-4/
+        └── exercises/
+            └── 3.5-optimized-project/
 ```
 
 ## About This Course
