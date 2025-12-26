@@ -1,50 +1,31 @@
-# DevOps with Docker
+# DevOps with Docker - Completed Exercises
 
-Course exercises from the University of Helsinki's DevOps with Docker program.
+Repository containing solutions to exercises from the University of Helsinki's DevOps with Docker course.
 
-## Overview
+## Completed Exercises
 
-This repository contains solutions to the exercises from the official DevOps with Docker course. The course covers containerization using Docker, best practices, and tools for modern DevOps workflows.
+### Part 1: Docker Basics
 
-## Course Chapters
+#### Chapter 2: Docker Basics
 
-- **Part 1:** Introduction to Containers and Docker
-- **Part 2:** Docker Compose
-- **Part 3:** Orchestration
+- **1.1 Getting Started** ✓ - Starting and managing containers in detached mode
 
 ## Repository Structure
 
 ```
 .
 ├── README.md
-├── part-1/
-│   ├── chapter-2/
-│   │   └── exercises/
-│   │       ├── 1.1-getting-started/
-│   │       └── ...
-│   └── ...
-└── part-2/
-└── part-3/
+└── part-1/
+    └── chapter-2/
+        └── exercises/
+            └── 1.1-getting-started/
+                ├── ANSWER.txt
+                └── README.md
 ```
 
-## How to Use
+## About This Course
 
-Each exercise directory contains:
-- Solution files and commands
-- Output examples
-- Explanations of concepts
-
-## Getting Started
-
-Before attempting the exercises, ensure you have Docker installed:
-
-```bash
-docker --version
-```
-
-For installation, visit: https://docs.docker.com/get-docker/
-
-## References
+The DevOps with Docker course from the University of Helsinki covers containerization using Docker, orchestration, and modern DevOps practices.
 
 - Official Course: https://docker-esa.dev/
 - Docker Documentation: https://docs.docker.com/
