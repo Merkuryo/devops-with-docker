@@ -12,6 +12,12 @@ This exercise extends the deployment pipeline from Exercise 3.1 to automatically
 
 **Live Application URL**: Will be provided after Render.com deployment setup
 
+## Deployed Application
+
+**Live Application URL**: [https://devops-with-docker-vzjv.onrender.com](https://devops-with-docker-vzjv.onrender.com)
+
+This application is automatically deployed to Render.com. Every push to the main branch triggers GitHub Actions, which builds the Docker image, pushes to Docker Hub, and automatically deploys the new version via Render.com's API.
+
 ## Architecture
 
 ```

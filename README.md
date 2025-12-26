@@ -2,6 +2,13 @@
 
 Repository containing solutions to exercises from the University of Helsinki's DevOps with Docker course.
 
+## Deployed Applications
+
+### Exercise 1.16 & 3.2: Cloud Deployment
+**Live Application**: [https://devops-with-docker-vzjv.onrender.com](https://devops-with-docker-vzjv.onrender.com)
+
+Exercise 3.2 adds automated deployment via GitHub Actions. Every push to the main branch automatically builds and deploys the application to this URL.
+
 ## Completed Exercises
 
 ### Part 1: Docker Basics
