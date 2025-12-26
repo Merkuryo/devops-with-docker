@@ -1,0 +1,94 @@
+## Exercise 2.2 - Simple Service with Browser
+
+### docker-compose.yaml
+
+```yaml
+services:
+  simple-web-service:
+    image: devopsdockeruh/simple-web-service
+    container_name: simple-web-service
+    ports:
+      - 8080:8080
+    command: server
+```
+
+### Running the Service
+
+```bash
+docker compose up
+```
+
+Or in detached mode:
+```bash
+docker compose up -d
+```
+
+### Testing the Service
+
+**With browser:**
+Navigate to `http://localhost:8080`
+
+**With curl:**
+```bash
+curl http://localhost:8080
+```
+
+### Expected Output
+
+The service responds with JSON:
+```json
+{"message":"You connected to the following path: /","path":"/"}
+```
+
+### Stopping the Service
+
+```bash
+docker compose down
+```
+
+### Key Differences from Docker Run
+
+**Traditional Docker command:**
+```bash
+docker run -p 8080:8080 devopsdockeruh/simple-web-service server
+```
+
+**Docker Compose equivalent:**
+```yaml
+services:
+  simple-web-service:
+    image: devopsdockeruh/simple-web-service
+    ports:
+      - 8080:8080
+    command: server
+```
+
+### Why Use Docker Compose?
+
+1. **Declarative Configuration** - Clear and version-controllable
+2. **Simplified Commands** - `docker compose up` instead of long docker run commands
+3. **Reproducibility** - Easy to share and replicate setup
+4. **Multi-container Ready** - Can easily add more services
+5. **Environment Variables** - Easy to configure via compose file
+
+### Port Mapping Explained
+
+- `ports: - 8080:8080` means:
+  - Host machine port 8080 → Container port 8080
+  - Allows access from browser at localhost:8080
+  - Container listens on its own port 8080
+
+### Command Override
+
+- The `command: server` overrides the Dockerfile's default command
+- Without this, the container would run the default command
+- With `server`, it starts the web service listening on port 8080
+
+### Verification Checklist
+
+- ✓ docker-compose.yaml exists in the directory
+- ✓ `docker compose up` starts the service
+- ✓ Service is accessible at http://localhost:8080
+- ✓ Browser shows the service response
+- ✓ `curl localhost:8080` returns JSON response
+- ✓ `docker compose down` stops the service cleanly

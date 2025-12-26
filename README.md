@@ -30,6 +30,7 @@ Repository containing solutions to exercises from the University of Helsinki's D
 #### Chapter 1: Docker Compose Basics
 
 - **2.1 Simple Service Writing to Log** ✓ - Docker Compose with volume binding for logs
+- **2.2 Simple Service with Browser** ✓ - Docker Compose with port mapping for web service
 
 ## Repository Structure
 
