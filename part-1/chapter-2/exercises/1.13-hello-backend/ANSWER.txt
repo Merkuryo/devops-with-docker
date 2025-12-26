@@ -1,0 +1,79 @@
+## Exercise 1.13 - Hello Backend (Mandatory)
+
+## Dockerfile
+
+```dockerfile
+FROM golang:1.16
+
+WORKDIR /usr/src/app
+
+COPY . .
+
+RUN go build
+
+EXPOSE 8080
+
+CMD ["./server"]
+```
+
+## Build Command
+
+```bash
+docker build -t backend-app .
+```
+
+## Run Command
+
+```bash
+docker run -d -p 8080:8080 backend-app
+```
+
+Or all in one:
+
+```bash
+docker build -t backend-app . && docker run -d -p 8080:8080 backend-app
+```
+
+## Testing the Application
+
+Once the container is running, test the `/ping` endpoint:
+
+```bash
+curl http://localhost:8080/ping
+```
+
+Expected response: `pong`
+
+## Explanation
+
+The Dockerfile:
+
+1. **FROM golang:1.16** - Uses Go 1.16 as the base image (required by the project)
+2. **WORKDIR /usr/src/app** - Sets the working directory in the container
+3. **COPY . .** - Copies the entire project from the host to the container
+4. **RUN go build** - Compiles the Go code and generates a binary named "server"
+5. **EXPOSE 8080** - Exposes port 8080 (the default port for the application)
+6. **CMD ["./server"]** - Runs the compiled binary server application
+
+## Key Points
+
+- **golang:1.16** - Provides Go 1.16 runtime and build tools required by the project
+- **go build** - Automatically generates a binary named "server" in the working directory
+- **./server** - The compiled binary that starts the backend API server
+- **Port 8080** - The default port for the application (configurable via PORT environment variable)
+- **/ping endpoint** - Health check endpoint that returns "pong" as response
+
+## Success Criteria Met
+
+- ✓ Dockerfile builds successfully without errors
+- ✓ Container runs with port 8080 exposed and published
+- ✓ The /ping endpoint responds with "pong" at http://localhost:8080/ping
+- ✓ No code modifications made to the project
+
+## Environment Variables (for future exercises)
+
+The server supports additional environment variables:
+- `PORT` - Change the listening port (default: 8080)
+- `REQUEST_ORIGIN` - CORS configuration (used in later exercises)
+- `REDIS_HOST` - Redis host (used in later exercises)
+- `POSTGRES_HOST`, `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DATABASE` - Database configuration (used in later exercises)
