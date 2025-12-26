@@ -1,0 +1,197 @@
+# Exercise 3.4: Building Images from Inside a Container - Solution
+
+## Task
+
+Dockerize the builder script from Exercise 3.3 to run Docker commands inside a container by mounting docker.sock. Pass Docker Hub credentials as environment variables.
+
+## Solution Files
+
+### Dockerfile
+
+```dockerfile
+FROM docker:20-dind
+
+RUN apk add --no-cache git bash
+
+COPY builder.sh /usr/local/bin/builder.sh
+RUN chmod +x /usr/local/bin/builder.sh
+
+ENTRYPOINT ["/usr/local/bin/builder.sh"]
+```
+
+**Key Components:**
+- `docker:20-dind`: Docker image with Docker CLI and daemon
+- `apk add git bash`: Install required tools
+- `COPY builder.sh`: Include the automation script
+- `ENTRYPOINT`: Execute script with command arguments
+
+### builder.sh
+
+```bash
+#!/bin/bash
+set -e
+
+D="/tmp/docker_builder_$$"
+mkdir -p "$D" && cd "$D"
+
+[ $# -ne 2 ] && { echo "Usage: $0 <github_repo> <docker_hub_repo>"; exit 1; }
+
+# Login to Docker Hub using environment variables
+if [ -n "$DOCKER_USER" ] && [ -n "$DOCKER_PWD" ]; then
+    echo "$DOCKER_PWD" | docker login -u "$DOCKER_USER" --password-stdin
+fi
+
+git clone "https://github.com/$1.git" . || exit 1
+[ -f Dockerfile ] || exit 1
+
+docker build -t "$2:latest" .
+docker push "$2:latest"
+
+TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+docker tag "$2:latest" "$2:$TIMESTAMP"
+docker push "$2:$TIMESTAMP"
+
+rm -rf "$D"
+echo "Success: $2:latest pushed to Docker Hub"
+```
+
+**Enhancements from 3.3:**
+- Environment variable authentication: `DOCKER_USER` and `DOCKER_PWD`
+- Automatic Docker Hub login before push
+- Supports command-line arguments via ENTRYPOINT
+
+## Execution Flow
+
+1. **Build Image**
+   ```bash
+   docker build -t builder .
+   ```
+
+2. **Run Container**
+   ```bash
+   docker run -e DOCKER_USER=mluukkai \
+     -e DOCKER_PWD=password_here \
+     -v /var/run/docker.sock:/var/run/docker.sock \
+     builder mluukkai/express_app mluukkai/testing
+   ```
+
+3. **What Happens Inside Container:**
+   - Container receives environment variables
+   - Container receives docker.sock mount (access to host Docker)
+   - Script executes with arguments: `mluukkai/express_app` and `mluukkai/testing`
+   - Script logs in to Docker Hub with credentials
+   - Script clones repository from GitHub
+   - Script builds Docker image
+   - Script pushes image to Docker Hub
+   - Script cleans up
+
+## Docker-in-Docker Pattern
+
+**Key Concept:** Container doesn't need its own Docker daemon; it uses host's daemon via socket.
+
+```
+┌─────────────────────────────────────┐
+│          Host System                │
+│  ┌─────────────────────────────┐   │
+│  │   Docker Daemon             │   │
+│  │   /var/run/docker.sock      │   │
+│  └─────────────────────────────┘   │
+│           ▲                         │
+│           │ (socket mount)          │
+│  ┌─────────────────────────────┐   │
+│  │   Container (builder)       │   │
+│  │  ┌───────────────────────┐  │   │
+│  │  │ Docker CLI            │  │   │
+│  │  │ Git                   │  │   │
+│  │  │ builder.sh            │  │   │
+│  │  └───────────────────────┘  │   │
+│  └─────────────────────────────┘   │
+└─────────────────────────────────────┘
+```
+
+## Environment Variables
+
+| Variable | Purpose | Example |
+|----------|---------|---------|
+| `DOCKER_USER` | Docker Hub username | `mluukkai` |
+| `DOCKER_PWD` | Docker Hub password or token | `dckr_pat_abc123...` |
+
+**Best Practices:**
+- Use access tokens instead of passwords
+- Never hardcode in Dockerfile
+- Pass via `-e` flag at runtime
+- Use `.env` files or secrets management in production
+
+## ENTRYPOINT vs CMD
+
+**ENTRYPOINT (used here):**
+```dockerfile
+ENTRYPOINT ["/usr/local/bin/builder.sh"]
+```
+- Makes container executable
+- Arguments from `docker run` passed to script
+- Fixed command with variable arguments
+
+**Example:**
+```bash
+docker run builder mluukkai/express_app mluukkai/testing
+# → Runs: builder.sh mluukkai/express_app mluukkai/testing
+```
+
+## Docker Socket Security
+
+**Mount Read-Write:**
+```bash
+-v /var/run/docker.sock:/var/run/docker.sock
+```
+- Grants container full Docker access
+- Equivalent to `docker` group membership on host
+- Security risk if untrusted code runs in container
+
+**In Production:**
+- Use user namespaces
+- Run with minimal privileges
+- Use read-only mounts where possible
+- Validate all inputs
+
+## Testing Checklist
+
+✓ Dockerfile syntax valid
+✓ Image builds successfully
+✓ Image includes Git and bash
+✓ builder.sh executable in image
+✓ ENTRYPOINT correctly configured
+✓ Environment variables passed
+✓ docker.sock properly mounted
+✓ Docker Hub login works
+✓ Image builds and pushes successfully
+✓ Timestamped tags created
+✓ Error handling works
+
+## Common Issues
+
+**Issue:** "Cannot connect to Docker daemon"
+- **Solution:** Mount docker.sock: `-v /var/run/docker.sock:/var/run/docker.sock`
+
+**Issue:** "denied: requested access to the resource is denied"
+- **Solution:** Verify Docker Hub credentials and permissions
+
+**Issue:** "Dockerfile not found in repository root"
+- **Solution:** Repository must have Dockerfile in root directory
+
+## Lesson Summary
+
+This exercise demonstrates:
+1. Docker-in-Docker patterns using socket mounting
+2. Runtime configuration via environment variables
+3. ENTRYPOINT usage for container executables
+4. Security considerations for credentials
+5. Containerizing automation scripts
+
+The pattern is used by:
+- CI/CD systems (GitHub Actions, GitLab CI)
+- Watchtower (automatic updates)
+- Container registries
+- Build orchestration tools
+
+Real-world applications require additional security measures like secrets management, audit logging, and access control.

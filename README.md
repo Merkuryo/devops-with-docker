@@ -57,13 +57,14 @@ Exercise 3.2 adds automated deployment via GitHub Actions. Every push to the mai
 - **3.1 Your Pipeline** ✓ (Mandatory) - [GitHub Actions and Watchtower CI/CD deployment pipeline](part-2/chapter-3/exercises/3.1-your-pipeline/)
 - **3.2 Cloud Deployment** ✓ (Mandatory) - [Automated deployment pipeline to Render.com cloud service](part-2/chapter-3/exercises/3.2-cloud-deployment/) | [Live App](https://devops-with-docker-vzjv.onrender.com)
 - **3.3 Scripting Magic** ✓ - [Automated shell script for Docker build and push workflow](part-2/chapter-3/exercises/3.3-scripting-magic/)
+- **3.4 Building Images Inside Container** ✓ - [Dockerized builder with docker.sock and environment-based authentication](part-2/chapter-3/exercises/3.4-building-images-inside-container/)
 
 ## Statistics
 
-- **Total Exercises Completed:** 30/30
+- **Total Exercises Completed:** 31/31
   - Part 1: 16/16 exercises ✓
   - Part 2, Chapter 1: 11/11 exercises ✓
-  - Part 2, Chapter 3: 3/3 exercises ✓
+  - Part 2, Chapter 3: 4/4 exercises ✓
 
 - **Technologies Mastered:**
   - Docker containers and images
@@ -80,6 +81,8 @@ Exercise 3.2 adds automated deployment via GitHub Actions. Every push to the mai
   - Automated image building and pushing
   - Automatic container updates with Watchtower
   - Shell scripting and automation
+  - Docker-in-Docker (DinD) patterns
+  - Socket mounting for inter-process communication
 
 ## Repository Structure
 
@@ -126,7 +129,8 @@ Exercise 3.2 adds automated deployment via GitHub Actions. Every push to the mai
         └── exercises/
             ├── 3.1-your-pipeline/
             ├── 3.2-cloud-deployment/
-            └── 3.3-scripting-magic/
+            ├── 3.3-scripting-magic/
+            └── 3.4-building-images-inside-container/
 ```
 
 ## About This Course
