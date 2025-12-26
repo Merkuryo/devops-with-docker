@@ -15,6 +15,7 @@ Repository containing solutions to exercises from the University of Helsinki's D
 - **1.5 Sizes of Images** ✓ - Comparing Ubuntu and Alpine image sizes
 - **1.6 Hello Docker Hub** ✓ - Finding documentation on Docker Hub
 - **1.7 Image for Script** ✓ - Building a custom Docker image with Dockerfile
+- **1.8 Two Line Dockerfile** ✓ - Using ENTRYPOINT with default CMD arguments
 
 ## Repository Structure
 

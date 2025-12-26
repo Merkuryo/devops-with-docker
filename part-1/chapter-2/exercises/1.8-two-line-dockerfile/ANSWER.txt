@@ -1,0 +1,45 @@
+## Dockerfile
+
+```dockerfile
+FROM devopsdockeruh/simple-web-service:alpine
+CMD ["server"]
+```
+
+## Building the Image
+
+```bash
+docker build -t web-server .
+```
+
+## Running the Container
+
+```bash
+docker run web-server
+```
+
+## Output
+
+```
+[GIN-debug] [WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.
+
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:   export GIN_MODE=release
+ - using code:  gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] GET    /*path                    --> server.Start.func1 (3 handlers)
+[GIN-debug] Listening and serving HTTP on :8080
+```
+
+## Explanation
+
+This exercise demonstrates how:
+
+1. **ENTRYPOINT vs CMD** - The base image `devopsdockeruh/simple-web-service:alpine` has an ENTRYPOINT defined. When an image has ENTRYPOINT, CMD provides default arguments to it.
+
+2. **Minimal Dockerfile** - The title "Two Line Dockerfile" hints that this can be done with just two lines:
+   - `FROM` to specify the base image
+   - `CMD` to provide the default argument "server" to the ENTRYPOINT
+
+3. **Default Arguments** - By setting `CMD ["server"]`, the container automatically runs the server without needing to specify the argument on the command line.
+
+This is a clean example of leveraging existing ENTRYPOINT definitions in base images to create simple, minimal Dockerfiles.
