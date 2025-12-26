@@ -1,0 +1,176 @@
+## Exercise 2.8 - Reverse Proxy (Mandatory)
+
+### What Was Added
+
+**Nginx Reverse Proxy Service:**
+- Listens on port 80 (single external entry point)
+- Routes `/` requests to frontend (port 5000)
+- Routes `/api/` requests to backend (port 8080)
+- Runs as `nginx-proxy` container
+- Mounts `nginx.conf` configuration file
+
+### nginx.conf Configuration
+
+```nginx
+events { worker_connections 1024; }
+
+http {
+  server {
+    listen 80;
+
+    location / {
+      proxy_pass http://frontend:5000/;
+    }
+
+    location /api/ {
+      proxy_set_header Host $host;
+      proxy_pass http://backend:8080/;
+    }
+  }
+}
+```
+
+**Key elements:**
+- `listen 80` - Nginx listens on external port 80
+- `location /` - Matches root and all non-API requests
+- `proxy_pass http://frontend:5000/` - Forwards to frontend container
+- `location /api/` - Matches requests to `/api/` path
+- `proxy_set_header Host $host` - Preserves original host header
+- `proxy_pass http://backend:8080/` - Forwards to backend container
+- Service names (`frontend`, `backend`) resolve via Docker DNS
+
+### Changes to docker-compose.yaml
+
+**1. Added proxy service (first):**
+```yaml
+proxy:
+  image: nginx:latest
+  container_name: nginx-proxy
+  ports:
+    - 80:80
+  volumes:
+    - ./nginx.conf:/etc/nginx/nginx.conf:ro
+  depends_on:
+    - frontend
+    - backend
+  restart: unless-stopped
+```
+
+**2. Backend changes:**
+- Removed `ports: - 8080:8080` (no longer exposed directly)
+- Changed `REQUEST_ORIGIN=http://localhost` (from `http://localhost:5000`)
+- Backend still listens on 8080 internally, accessible only through Nginx
+
+**3. Frontend changes:**
+- Removed `ports: - 5000:5000` (no longer exposed directly)
+- Changed `REACT_APP_BACKEND_URL=http://localhost/api` (from `http://localhost:8080`)
+- Frontend still listens on 5000 internally, accessible only through Nginx
+
+**4. Redis and PostgreSQL:**
+- No changes - remain internal
+
+### How It Works
+
+1. Browser requests `http://localhost/`
+2. Nginx (port 80) receives request
+3. Matches `location /` rule
+4. Forwards to `http://frontend:5000/`
+5. Frontend responds, Nginx returns to browser
+
+For API requests:
+
+1. Frontend requests `http://localhost/api/ping`
+2. Nginx receives request on port 80
+3. Matches `location /api/` rule
+4. Forwards to `http://backend:8080/api/ping`
+5. Backend responds with `pong`
+6. Nginx returns response to browser
+
+### URL Mapping
+
+| Browser Request | Nginx Matches | Forwards To | Service |
+|-----------------|---------------|-------------|---------|
+| `http://localhost/` | `location /` | `http://frontend:5000/` | Frontend |
+| `http://localhost/static/css/...` | `location /` | `http://frontend:5000/static/css/...` | Frontend |
+| `http://localhost/api/ping` | `location /api/` | `http://backend:8080/api/ping` | Backend |
+| `http://localhost/api/messages` | `location /api/` | `http://backend:8080/api/messages` | Backend |
+
+### Testing
+
+```bash
+# Test root path (frontend)
+curl http://localhost/
+# Returns HTML
+
+# Test API endpoint (backend through proxy)
+curl http://localhost/api/ping
+# Returns: pong
+```
+
+### Why Reverse Proxy?
+
+1. **Single Entry Point** - One port for entire application
+2. **Simplified URLs** - No port numbers in URLs
+3. **Flexibility** - Can change internal ports without affecting clients
+4. **Security** - Hide internal service structure
+5. **Scalability** - Easy to add/modify backend routing
+6. **Production Ready** - Standard practice for web applications
+
+### Port Summary
+
+**External (accessible from host):**
+- Port 80 (Nginx)
+
+**Internal (Docker network only):**
+- Port 5000 (Frontend)
+- Port 8080 (Backend)
+- Port 6379 (Redis)
+- Port 5432 (PostgreSQL)
+
+### Docker Networking
+
+All services in same Docker network:
+- Service names resolve as hostnames
+- `http://frontend:5000` works from Nginx
+- `http://backend:8080` works from Nginx
+- Services can communicate using service names internally
+
+### Important Configuration Details
+
+**Trailing slashes:**
+```nginx
+location / {
+  proxy_pass http://frontend:5000/;
+}
+```
+Both sides have `/` - important for URL rewriting.
+
+**Host header preservation:**
+```nginx
+location /api/ {
+  proxy_set_header Host $host;
+  proxy_pass http://backend:8080/;
+}
+```
+`proxy_set_header` ensures backend sees original host.
+
+**Read-only config:**
+```yaml
+volumes:
+  - ./nginx.conf:/etc/nginx/nginx.conf:ro
+```
+`:ro` makes configuration immutable.
+
+### Success Criteria
+
+✓ Nginx running on port 80
+✓ `curl http://localhost/api/ping` returns `pong`
+✓ `curl http://localhost/` returns frontend HTML
+✓ Direct ports (5000, 8080) not accessible externally
+✓ Services communicate internally through Nginx
+✓ No errors in Nginx logs
+
+### Files Submitted
+
+1. **docker-compose.yaml** - Full service configuration with Nginx
+2. **nginx.conf** - Reverse proxy routing rules
