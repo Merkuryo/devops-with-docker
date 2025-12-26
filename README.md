@@ -18,6 +18,7 @@ Repository containing solutions to exercises from the University of Helsinki's D
 - **1.8 Two Line Dockerfile** ✓ - Using ENTRYPOINT with default CMD arguments
 - **1.9 Volumes** ✓ - Using bind mounts to access container files from host
 - **1.10 Ports Open** ✓ - Exposing web services using port mapping
+- **1.11 Spring** ✓ - Containerizing a Java Spring application
 
 ## Repository Structure
 
