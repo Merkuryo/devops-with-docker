@@ -1,0 +1,105 @@
+## Frontend Dockerfile
+
+```dockerfile
+FROM node:16
+
+WORKDIR /usr/src/app
+
+ENV REACT_APP_BACKEND_URL=http://localhost:8080
+
+COPY . .
+
+RUN npm install && npm run build
+
+RUN npm install -g serve
+
+EXPOSE 5000
+
+CMD ["serve", "-s", "-l", "5000", "build"]
+```
+
+## Backend Dockerfile
+
+```dockerfile
+FROM golang:1.16
+
+WORKDIR /usr/src/app
+
+ENV REQUEST_ORIGIN=http://localhost:5000
+
+COPY . .
+
+RUN go build
+
+EXPOSE 8080
+
+CMD ["./server"]
+```
+
+## Build Commands
+
+### Build Frontend
+```bash
+cd example-frontend
+docker build -t frontend-app .
+```
+
+### Build Backend
+```bash
+cd example-backend
+docker build -t backend-app .
+```
+
+## Run Commands
+
+### Run Backend (must start first for proper CORS setup)
+```bash
+docker run -d -p 8080:8080 --name backend-app backend-app
+```
+
+### Run Frontend
+```bash
+docker run -d -p 5000:5000 --name frontend-app frontend-app
+```
+
+Or start both simultaneously:
+```bash
+docker run -d -p 8080:8080 --name backend-app backend-app && docker run -d -p 5000:5000 --name frontend-app frontend-app
+```
+
+## Testing
+
+1. Open browser and navigate to `http://localhost:5000`
+2. Find the button for Exercise 1.14
+3. Click the button
+4. Button should turn green if communication is successful
+
+## Explanation
+
+**Frontend Environment Variable:**
+- `ENV REACT_APP_BACKEND_URL=http://localhost:8080` - Set before build time so the React app knows where to find the backend
+- The build process uses this variable to configure the API endpoint
+- The browser (running on localhost) can access the backend at this URL
+
+**Backend Environment Variable:**
+- `ENV REQUEST_ORIGIN=http://localhost:5000` - Tells the backend to accept CORS requests from the frontend
+- CORS (Cross-Origin Resource Sharing) is a security mechanism that prevents unauthorized cross-origin requests
+- The backend checks the request origin against this value
+
+## Key Points
+
+- Frontend environment variables must be set BEFORE `npm run build` (build time configuration)
+- Backend environment variables can be set at container runtime
+- Both containers must be accessible via localhost from the browser
+- The frontend JavaScript is executed by the browser, not the container
+- Port mapping ensures the browser can reach both services on the specified ports
+
+## Success Criteria Met
+
+- ✓ Frontend Dockerfile includes REACT_APP_BACKEND_URL
+- ✓ Backend Dockerfile includes REQUEST_ORIGIN
+- ✓ Both images build without errors
+- ✓ Both containers run with correct port mappings
+- ✓ Frontend can communicate with backend
+- ✓ Exercise 1.14 button turns green on successful backend request
+- ✓ No code modifications made to either project
