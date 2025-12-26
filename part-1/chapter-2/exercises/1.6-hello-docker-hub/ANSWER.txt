@@ -1,0 +1,46 @@
+## Instructions
+
+Run the container:
+```bash
+docker run -it devopsdockeruh/pull_exercise
+```
+
+Navigate to Docker Hub to find the documentation for this image:
+https://hub.docker.com/r/devopsdockeruh/pull_exercise/
+
+The image README contains instructions about the password needed.
+
+## Finding the Password
+
+The documentation indicates that the password is "basics".
+
+## Running the Container with Input
+
+```bash
+script -q -c 'docker run -it devopsdockeruh/pull_exercise' /dev/null << 'EOF'
+basics
+EOF
+```
+
+Or using echo with a pseudo-terminal:
+```bash
+echo "basics" | docker run -it devopsdockeruh/pull_exercise
+```
+
+## Output
+
+```
+Give me the password: basics
+You found the correct password. Secret message is:
+"This is the secret message"
+```
+
+## The Secret Message
+
+**"This is the secret message"**
+
+This exercise demonstrates how to:
+- Navigate Docker Hub to find documentation
+- Read README files for images
+- Follow instructions provided by image creators
+- Interact with containerized applications

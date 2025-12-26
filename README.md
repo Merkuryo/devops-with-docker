@@ -13,6 +13,7 @@ Repository containing solutions to exercises from the University of Helsinki's D
 - **1.3 Secret Message** ✓ - Accessing running containers with docker exec
 - **1.4 Missing Dependencies** ✓ - Installing packages inside a running container
 - **1.5 Sizes of Images** ✓ - Comparing Ubuntu and Alpine image sizes
+- **1.6 Hello Docker Hub** ✓ - Finding documentation on Docker Hub
 
 ## Repository Structure
 
