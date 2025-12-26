@@ -25,6 +25,12 @@ Repository containing solutions to exercises from the University of Helsinki's D
 - **1.15 Homework** ✓ (Mandatory) - Publishing a custom application to Docker Hub
 - **1.16 Cloud Deployment** ✓ - Deploying a containerized application to cloud provider (Render.com)
 
+### Part 2: Docker Compose
+
+#### Chapter 1: Docker Compose Basics
+
+- **2.1 Simple Service Writing to Log** ✓ - Docker Compose with volume binding for logs
+
 ## Repository Structure
 
 ```

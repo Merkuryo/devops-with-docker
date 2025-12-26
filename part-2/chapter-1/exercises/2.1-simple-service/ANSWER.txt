@@ -1,0 +1,79 @@
+## Exercise 2.1 - Simple Service Writing to Log
+
+### docker-compose.yaml
+
+```yaml
+services:
+  simple-web-service:
+    image: devopsdockeruh/simple-web-service
+    container_name: simple-web-service
+    volumes:
+      - .:/usr/src/app
+```
+
+### Running the Service
+
+```bash
+docker compose up
+```
+
+### Checking the Logs
+
+In another terminal:
+```bash
+tail -f text.log
+```
+
+Or view the complete log file:
+```bash
+cat text.log
+```
+
+### Expected Output
+
+The service will write to `text.log`:
+```
+2025-01-15 10:23:45 Log entry 1
+2025-01-15 10:23:50 Log entry 2
+2025-01-15 10:23:55 Log entry 3
+...
+```
+
+### Stopping the Service
+
+```bash
+docker compose down
+```
+
+### Why This Works
+
+1. **Service Definition:** The docker-compose.yaml defines a service using the pre-built image
+2. **Volume Binding:** The volume `.:/usr/src/app` maps the host current directory to the container's app directory
+3. **Automatic Logging:** The service automatically writes to text.log every few seconds
+4. **Persistent Storage:** Logs remain in the host filesystem even after the container stops
+
+### Advantages of Docker Compose
+
+- **Simplicity:** Single docker compose up command instead of complex docker run
+- **Declarative:** Configuration is clear and version-controllable
+- **Reproducibility:** Anyone can run the same setup
+- **Multi-container:** Easy to add more services later
+- **Volume Management:** Simple volume syntax
+
+### File Structure
+
+```
+2.1-simple-service/
+├── docker-compose.yaml
+├── text.log (created after running)
+└── README.md
+```
+
+### Verification
+
+The exercise is complete when:
+- ✓ docker-compose.yaml exists in the directory
+- ✓ `docker compose up` starts the service
+- ✓ text.log file is created in the host directory
+- ✓ Log entries are visible in text.log
+- ✓ `docker compose down` stops the service cleanly
