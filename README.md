@@ -23,6 +23,7 @@ Repository containing solutions to exercises from the University of Helsinki's D
 - **1.13 Hello Backend** ✓ (Mandatory) - Containerizing a Go backend application
 - **1.14 Environment** ✓ (Mandatory) - Configuring frontend-backend communication with environment variables
 - **1.15 Homework** ✓ (Mandatory) - Publishing a custom application to Docker Hub
+- **1.16 Cloud Deployment** ✓ - Deploying a containerized application to cloud provider (Render.com)
 
 ## Repository Structure
 

@@ -1,0 +1,104 @@
+## Exercise 1.16 - Cloud Deployment
+
+### Application Deployed
+
+**Frontend React Application** deployed to Render.com
+
+### Dockerfile
+
+```dockerfile
+FROM node:16
+
+WORKDIR /usr/src/app
+
+ENV REACT_APP_BACKEND_URL=http://localhost:8080
+
+COPY . .
+
+RUN npm install && npm run build
+
+RUN npm install -g serve
+
+EXPOSE 5000
+
+CMD ["serve", "-s", "-l", "5000", "build"]
+```
+
+### Deployment Instructions for Render.com
+
+1. **Create Render Account**
+   - Go to https://render.com
+   - Sign up with GitHub account
+
+2. **Connect Repository**
+   - Connect your GitHub repository (devops-with-docker)
+   - Select the repository
+
+3. **Create Web Service**
+   - New → Web Service
+   - Select your GitHub repo
+   - Build command: Leave default (Render detects Dockerfile)
+   - Start command: Leave default (uses ENTRYPOINT)
+   - Port: 5000
+
+4. **Configure Environment**
+   - If needed, add environment variables
+   - For this app: No additional env vars needed
+
+5. **Deploy**
+   - Click Deploy
+   - Wait for build and deployment
+   - Get public URL
+
+### Running the App Locally (for testing before deployment)
+
+```bash
+cd example-frontend
+
+# Build image
+docker build -t frontend-app .
+
+# Run container
+docker run -d -p 5000:5000 frontend-app
+
+# Access at http://localhost:5000
+```
+
+### Deployment URL Format
+
+Once deployed, your app will be available at:
+```
+https://<app-name>.onrender.com
+```
+
+### Advantages of Render.com
+
+- Free tier available
+- Easy GitHub integration
+- Automatic deploys on push
+- No credit card required
+- Simple to use interface
+
+### What Makes This Work
+
+1. **Dockerfile** - Containerizes the application
+2. **GitHub Push** - Triggers automatic deployment
+3. **Render Detection** - Automatically finds and uses Dockerfile
+4. **Port Mapping** - 5000 is exposed and accessible
+5. **Build Process** - npm install and build happen in cloud
+
+### Troubleshooting
+
+If deployment fails:
+- Check logs in Render dashboard
+- Verify Dockerfile syntax
+- Ensure all dependencies in package.json
+- Check Node.js version compatibility
+
+### Expected Output
+
+Once deployed successfully:
+- App accessible at public Render URL
+- React interface loads and functions
+- No localhost access needed
+- Shareable link for portfolio
