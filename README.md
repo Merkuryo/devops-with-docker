@@ -63,14 +63,15 @@ Exercise 3.2 adds automated deployment via GitHub Actions. Every push to the mai
 
 - **3.5 Optimized Project** ✓ (Mandatory) - [Non-root user security hardening for frontend and backend](part-2/chapter-4/exercises/3.5-optimized-project/)
 - **3.6 Optimized Project Images** ✓ - [Image size optimization through Alpine base and layer reduction](part-2/chapter-4/exercises/3.6-optimized-project-images/)
+- **3.7 Project with Preinstalled Environments** ✓ - [Leveraging preinstalled Docker base images (node:16-alpine, golang:1.16-alpine) for optimal image composition](part-2/chapter-4/exercises/3.7-project-with-preinstalled-environments/)
 
 ## Statistics
 
-- **Total Exercises Completed:** 33/33
+- **Total Exercises Completed:** 34/34
   - Part 1: 16/16 exercises ✓
   - Part 2, Chapter 1: 11/11 exercises ✓
   - Part 2, Chapter 3: 4/4 exercises ✓
-  - Part 2, Chapter 4: 2/2 exercises ✓
+  - Part 2, Chapter 4: 3/3 exercises ✓
 
 - **Technologies Mastered:**
   - Docker containers and images
@@ -93,6 +94,8 @@ Exercise 3.2 adds automated deployment via GitHub Actions. Every push to the mai
   - Linux user management (Debian vs Alpine)
   - Image size optimization (layer reduction, Alpine Linux)
   - Multi-base image selection strategies
+  - Preinstalled environment images (official Docker Hub images)
+  - Base image comparison and optimization
 
 ## Repository Structure
 
@@ -141,11 +144,11 @@ Exercise 3.2 adds automated deployment via GitHub Actions. Every push to the mai
             ├── 3.2-cloud-deployment/
             ├── 3.3-scripting-magic/
             └── 3.4-building-images-inside-container/
-└── part-3/
     └── chapter-4/
         └── exercises/
             ├── 3.5-optimized-project/
-            └── 3.6-optimized-project-images/
+            ├── 3.6-optimized-project-images/
+            └── 3.7-project-with-preinstalled-environments/
 ```
 
 ## About This Course
