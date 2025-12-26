@@ -44,13 +44,14 @@ Repository containing solutions to exercises from the University of Helsinki's D
 #### Chapter 2: Security and Optimization
 
 - **3.1 Your Pipeline** ✓ (Mandatory) - GitHub Actions and Watchtower CI/CD deployment pipeline
+- **3.2 Cloud Deployment** ✓ (Mandatory) - Automated deployment pipeline to Render.com cloud service
 
 ## Statistics
 
-- **Total Exercises Completed:** 28/28
+- **Total Exercises Completed:** 29/29
   - Part 1: 16/16 exercises ✓
   - Part 2, Chapter 1: 11/11 exercises ✓
-  - Part 2, Chapter 2: 1/1 exercises ✓
+  - Part 2, Chapter 2: 2/2 exercises ✓
 
 - **Technologies Mastered:**
   - Docker containers and images
@@ -107,7 +108,8 @@ Repository containing solutions to exercises from the University of Helsinki's D
     │       └── 2.11-your-dev-env/
     └── chapter-2/
         └── exercises/
-            └── 3.1-your-pipeline/
+            ├── 3.1-your-pipeline/
+            └── 3.2-cloud-deployment/
 ```
 
 ## About This Course
