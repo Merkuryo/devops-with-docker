@@ -1,0 +1,134 @@
+## Exercise 2.5 - Scale
+
+### Commands Used
+
+**1. Clone the project:**
+```bash
+git clone https://github.com/docker-hy/material-applications.git
+cd material-applications/scaling-exercise
+```
+
+**2. Start the application (initial run - will fail):**
+```bash
+docker compose up
+```
+
+The application won't work because single compute instance can't handle the load. Button stays red.
+
+**3. Scale compute containers:**
+```bash
+docker compose up --scale compute=3
+```
+
+Or in detached mode:
+```bash
+docker compose up -d --scale compute=3
+```
+
+**4. Access the application:**
+```
+http://localhost:3000
+```
+
+**5. The button should now turn GREEN** indicating successful scaling.
+
+### Understanding the Setup
+
+**docker-compose.yml contains:**
+
+1. **calculator** - Frontend on port 3000
+   - User interface
+   - Sends jobs to compute backend
+
+2. **compute** - Backend compute service
+   - VIRTUAL_HOST=compute.localtest.me
+   - Multiple instances created by scaling
+
+3. **load-balancer** - nginx-proxy
+   - Routes requests to compute instances
+   - Mounts docker.sock for service discovery
+   - Distributes load across instances
+
+### How It Works
+
+1. User clicks button in frontend (http://localhost:3000)
+2. Frontend sends request to compute backend (compute.localtest.me)
+3. Load balancer receives request
+4. Load balancer routes to available compute instance
+5. Compute processes request
+6. Response sent back to frontend
+7. Button turns green on success
+
+### Scaling Explanation
+
+**Single instance:** Compute gets overloaded → timeouts → button red
+
+**Multiple instances:** Load balancer distributes requests → all instances handle some load → requests complete → button green
+
+### Checking Scaled Instances
+
+```bash
+docker compose ps
+```
+
+Shows all running containers including multiple compute instances:
+- compute_compute_1
+- compute_compute_2
+- compute_compute_3
+(etc.)
+
+### Finding Port Mapping
+
+```bash
+docker compose port --index 1 compute 8080
+docker compose port --index 2 compute 8080
+docker compose port --index 3 compute 8080
+```
+
+### Load Balancer Details
+
+- nginx-proxy listens on port 80
+- Reads VIRTUAL_HOST environment variable
+- Routes compute.localtest.me to compute service
+- Automatically discovers new instances via docker.sock
+- Uses round-robin load balancing
+
+### Why localtest.me?
+
+- `localtest.me` and all subdomains (*.localtest.me) resolve to 127.0.0.1
+- `compute.localtest.me` = localhost:80 (load balancer)
+- Simulates real DNS without hosts file editing
+- Other options: colasloth.com, lvh.me, vcap.me
+
+### Testing the Load
+
+```bash
+# Generate some traffic to see load balancing
+for i in {1..10}; do curl http://localhost:3000; done
+```
+
+Each request may hit different compute instance.
+
+### Cleanup
+
+```bash
+docker compose down
+```
+
+Removes all containers (calculator, load-balancer, and all compute instances).
+
+### Key Learning Points
+
+1. **Scaling:** Multiple container instances of same service
+2. **Load Balancing:** Distributing requests across instances
+3. **Service Discovery:** Automatic container discovery via docker.sock
+4. **Virtual Hosting:** Routing based on VIRTUAL_HOST variable
+5. **Docker Compose Scaling:** --scale flag for easy replication
+
+### Success Verification
+
+- ✓ Application accessible at http://localhost:3000
+- ✓ Button turns green when clicked
+- ✓ Multiple compute instances running
+- ✓ Load balancer distributes requests
+- ✓ No timeout errors
