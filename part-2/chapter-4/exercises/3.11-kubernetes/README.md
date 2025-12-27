@@ -408,17 +408,41 @@ At least 4 of these 5 required.
 - Namespace boundaries (optional)
 - Replica counts (e.g., "2 replicas" for Game Server)
 
-## How to Submit
+## ✅ ANSWER - Kubernetes Architecture Diagram
 
-1. Create diagram on draw.io
-2. Save to shareable link
-3. Share link in exercise submission
-4. Ensure diagram clearly shows:
-   - 3+ host machines
-   - 2 applications
-   - Your computer with kubectl
-   - HTTP traffic from internet
-   - 4+ Kubernetes component labels
+**Submitted URL:**
+```
+https://drive.google.com/file/d/1SzL4xv8_3y7sH19wGriWMqT3kawV0VsN/view?usp=sharing
+```
+
+### Diagram Verification Checklist
+
+✅ **Required Components**
+- ✓ Kubernetes Cluster boundary clearly marked
+- ✓ Master Node (Control Plane)
+- ✓ Worker Nodes (3+ hosts total)
+- ✓ Pods and Containers
+- ✓ Services (LoadBalancer + ClusterIP)
+- ✓ Volumes for persistent storage
+- ✓ kubectl client from user's computer
+- ✓ Internet HTTP traffic to LoadBalancer
+
+✅ **Required Labels** (4+)
+- ✓ Pod
+- ✓ Cluster
+- ✓ Container
+- ✓ Service
+- ✓ Volume
+
+✅ **Required Applications**
+- ✓ Blog Website (Backend + Database)
+- ✓ Game Server (with multiple replicas)
+
+✅ **Network Flow**
+- ✓ kubectl commands from user's computer
+- ✓ External HTTP requests reaching LoadBalancer
+- ✓ Internal ClusterIP services routing
+- ✓ Pods with persistent storage
 
 ## Important Notes
 
