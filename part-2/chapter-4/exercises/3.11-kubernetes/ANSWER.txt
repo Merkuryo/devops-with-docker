@@ -1,0 +1,329 @@
+# Exercise 3.11: Kubernetes - Diagram Solution Guide
+
+## Task
+
+Create a Kubernetes architecture diagram showing:
+- At least 3 host machines in a cluster
+- 2 running applications
+- kubectl commands from your computer
+- HTTP traffic from the internet
+- At least 4 of these labels: Pod, Cluster, Container, Service, Volume
+
+## Solution Approach
+
+### Diagram Structure
+
+The diagram should show a complete Kubernetes system with:
+
+1. **Kubernetes Cluster** (main box encompassing everything)
+   - 1 Master/Control Plane Node
+   - 2-3 Worker Nodes (at least 3 total machines)
+
+2. **Two Applications**
+   - Blog Website (Backend + Database)
+   - Game Server (Game Engine + Cache)
+
+3. **Components Inside Each Node**
+   - Master Node: API Server, Scheduler, Controller Manager, etcd
+   - Worker Nodes: Kubelet, kube-proxy, Container Runtime
+
+4. **Pods and Containers**
+   - Show multiple Pods per worker node
+   - Containers inside Pods
+
+5. **Services**
+   - LoadBalancer Services for internet access
+   - ClusterIP Service for internal communication
+
+6. **External Elements**
+   - Your computer with kubectl client
+   - Internet traffic entering via LoadBalancer
+
+### Key Elements to Include
+
+#### 1. Cluster Boundary
+```
+Large box labeled "Kubernetes Cluster" containing all nodes
+```
+
+#### 2. Master Node
+```
+┌─ Master Node ──────────────────────┐
+│ • API Server (listens for kubectl)  │
+│ • Scheduler (places Pods on nodes)  │
+│ • Controller Manager                │
+│ • etcd (persistent data store)      │
+└────────────────────────────────────┘
+```
+
+#### 3. Worker Nodes (2-3 minimum)
+```
+┌─ Worker Node 1 ───────────────────┐
+│ • Kubelet (manages Pods)          │
+│ • kube-proxy (networking)         │
+│ • Container Runtime (Docker)      │
+│                                   │
+│ ┌─ POD: App-1 ─────────────────┐ │
+│ │ ┌─ CONTAINER ────────────┐  │ │
+│ │ │ Application Process    │  │ │
+│ │ └────────────────────────┘  │ │
+│ └───────────────────────────┘  │
+└───────────────────────────────┘
+```
+
+#### 4. Applications with Multiple Pods
+
+**Application 1: Blog Website**
+```
+Pod 1: Blog Backend (Node.js)
+  └─ Container: Node.js server
+Pod 2: Blog Database (PostgreSQL)
+  └─ Container: Database
+Pod 3: Blog Cache (Redis)
+  └─ Container: Cache
+```
+
+**Application 2: Game Server**
+```
+Pod 4: Game Server Instance 1 (Go)
+  └─ Container: Game binary
+Pod 5: Game Server Instance 2 (Go)
+  └─ Container: Game binary
+Pod 6: Game Leaderboard (MongoDB)
+  └─ Container: Database
+```
+
+#### 5. Services
+```
+Service 1: LoadBalancer for Blog (port 80)
+  → Routes to Pod 1 (port 3000)
+
+Service 2: ClusterIP for Blog DB (port 5432)
+  → Routes to Pod 2 (port 5432)
+
+Service 3: LoadBalancer for Game (port 9000)
+  → Routes to Pods 4, 5 (load balanced, port 8080)
+```
+
+#### 6. Volumes
+```
+Volume 1: Blog Database Storage
+  → Mounted on Pod 2 (PostgreSQL data)
+
+Volume 2: Game Leaderboard Storage
+  → Mounted on Pod 6 (MongoDB data)
+```
+
+## Complete Example Diagram
+
+```
+┌────────────────────────────────────────────────────────────────┐
+│                                                                │
+│  USER'S COMPUTER                                              │
+│  ┌──────────────────────┐                                     │
+│  │   kubectl CLI        │                                     │
+│  │ $ kubectl apply -f   │                                     │
+│  │   blog-deployment    │                                     │
+│  └──────────┬───────────┘                                     │
+│             │                                                 │
+│             │ HTTPS API                                       │
+│             ▼                                                 │
+│  ╔══════════════════════════════════════════════════════════╗ │
+│  ║    KUBERNETES CLUSTER                                   ║ │
+│  ║                                                          ║ │
+│  ║  ┌──────────────────────────────────────────────────┐  ║ │
+│  ║  │        MASTER NODE (Control Plane)              │  ║ │
+│  ║  │  ┌─────────────────────────────────────────────┐│  ║ │
+│  ║  │  │ • API Server (listens on :6443)            ││  ║ │
+│  ║  │  │ • Scheduler (assigns Pods to Nodes)        ││  ║ │
+│  ║  │  │ • Controller Manager (manages replica set) ││  ║ │
+│  ║  │  │ • etcd (cluster state: 127.0.0.1:2379)    ││  ║ │
+│  ║  │  └─────────────────────────────────────────────┘│  ║ │
+│  ║  └──────────────────────────────────────────────────┘  ║ │
+│  ║                                                          ║ │
+│  ║  ┌──────────────────────────┐  ┌──────────────────────┐ ║ │
+│  ║  │   WORKER NODE 1          │  │   WORKER NODE 2     │ ║ │
+│  ║  │ • Kubelet (manages Pods) │  │ • Kubelet           │ ║ │
+│  ║  │ • kube-proxy (networking)│  │ • kube-proxy        │ ║ │
+│  ║  │ • Docker Runtime         │  │ • Docker Runtime    │ ║ │
+│  ║  │                          │  │                     │ ║ │
+│  ║  │ ┌────────────────────┐   │  │ ┌─────────────────┐ │ ║ │
+│  ║  │ │ POD: blog-backend  │   │  │ │ POD: game-srv-1 │ │ ║ │
+│  ║  │ │ ┌──────────────┐   │   │  │ │ ┌─────────────┐ │ │ ║ │
+│  ║  │ │ │CONTAINER    │   │   │  │ │ │CONTAINER  │ │ │ ║ │
+│  ║  │ │ │Node.js App  │   │   │  │ │ │Go Binary  │ │ │ ║ │
+│  ║  │ │ │Port: 3000   │   │   │  │ │ │Port: 8080 │ │ │ ║ │
+│  ║  │ │ └──────────────┘   │   │  │ │ └─────────────┘ │ │ ║ │
+│  ║  │ └────────────────────┘   │  │ └─────────────────┘ │ ║ │
+│  ║  │                          │  │                     │ ║ │
+│  ║  │ ┌────────────────────┐   │  │ ┌─────────────────┐ │ ║ │
+│  ║  │ │ POD: blog-database │   │  │ │ POD: game-srv-2 │ │ ║ │
+│  ║  │ │ ┌──────────────┐   │   │  │ │ ┌─────────────┐ │ │ ║ │
+│  ║  │ │ │CONTAINER    │   │   │  │ │ │CONTAINER  │ │ │ ║ │
+│  ║  │ │ │PostgreSQL   │   │   │  │ │ │Go Binary  │ │ │ ║ │
+│  ║  │ │ │Port: 5432   │   │   │  │ │ │Port: 8080 │ │ │ ║ │
+│  ║  │ │ └──────────────┘   │   │  │ │ └─────────────┘ │ │ ║ │
+│  ║  │ │                    │   │  │                   │ │ ║ │
+│  ║  │ │ VOLUME (Storage)   │   │  │ VOLUME (Storage)  │ │ ║ │
+│  ║  │ │ /var/lib/postgres  │   │  │ /game/leaderboard │ │ ║ │
+│  ║  │ └────────────────────┘   │  │                   │ │ ║ │
+│  ║  └──────────────────────────┘  └─────────────────┘ ║ │
+│  ║                                                      ║ │
+│  ║  ┌──────────────────────────────────────────────┐  ║ │
+│  ║  │         KUBERNETES SERVICES                 │  ║ │
+│  ║  │                                              │  ║ │
+│  ║  │ LoadBalancer: blog.example.com:80           │  ║ │
+│  ║  │ └─► Selects Pods with label: app=blog      │  ║ │
+│  ║  │     └─► Routes to blog-backend Pod:3000     │  ║ │
+│  ║  │                                              │  ║ │
+│  ║  │ ClusterIP: blog-db.default.svc.cluster.local│  ║ │
+│  ║  │ └─► Selects Pods with label: app=blog-db   │  ║ │
+│  ║  │     └─► Routes to blog-database Pod:5432    │  ║ │
+│  ║  │                                              │  ║ │
+│  ║  │ LoadBalancer: game.example.com:9000         │  ║ │
+│  ║  │ └─► Selects Pods with label: app=game      │  ║ │
+│  ║  │     ├─► Routes to game-srv-1 Pod:8080      │  ║ │
+│  ║  │     └─► Routes to game-srv-2 Pod:8080      │  ║ │
+│  ║  │        (load balanced)                      │  ║ │
+│  ║  └──────────────────────────────────────────────┘  ║ │
+│  ║                                                      ║ │
+│  ╚──────────────────────────────────────────────────────╝ │
+│                                                          │
+└──────────────────────────────────────────────────────────┘
+
+    ┌─────────────────────────┐
+    │   INTERNET/HTTP USER    │
+    │  (Outside the cluster)  │
+    └────────────┬────────────┘
+                 │
+                 │ HTTP GET blog.example.com
+                 │
+                 ▼
+    ┌──────────────────────────┐
+    │  DNS Resolution          │
+    │  blog.example.com →      │
+    │  LoadBalancer IP Address │
+    └────────────┬─────────────┘
+                 │
+                 ▼
+    ┌──────────────────────────┐
+    │ LoadBalancer Service     │
+    │ (External IP, Port 80)   │
+    └────────────┬─────────────┘
+                 │ (Load Balancing)
+         ┌───────┴────────┐
+         ▼                ▼
+    [Pod: blog-backend] [Pod: blog-backend]
+    (load balanced)
+```
+
+## Required Labels in Diagram
+
+Make sure your diagram includes these labels:
+
+1. **Pod** ✓
+   - Show each Pod clearly labeled
+   - Example: "POD: blog-backend", "POD: game-srv-1"
+
+2. **Cluster** ✓
+   - Label the big box containing all nodes
+   - "KUBERNETES CLUSTER"
+
+3. **Container** ✓
+   - Label containers inside Pods
+   - Example: "CONTAINER: Node.js App"
+
+4. **Service** ✓
+   - Label each service and its type
+   - "LoadBalancer Service: blog.example.com"
+   - "ClusterIP Service: blog-db"
+
+5. **Volume** (recommended)
+   - Label persistent storage
+   - "/var/lib/postgres (PersistentVolume)"
+
+## Draw.io Creation Steps
+
+1. Go to draw.io
+2. Create new diagram
+3. Set background rectangle for Cluster
+4. Add Master Node rectangle
+5. Add 2-3 Worker Node rectangles
+6. Inside each Worker Node, add smaller Pod rectangles
+7. Inside each Pod, add Container shapes
+8. Add Service boxes below/beside Pods
+9. Add Volume symbols attached to Pods
+10. Add "Your Computer" box outside cluster
+11. Add arrows showing traffic flow
+12. Label everything clearly
+13. Save and share the link
+
+## Submission Format
+
+Submit the URL where your diagram can be found (e.g., public draw.io link)
+
+Example:
+```
+https://app.diagrams.net/#G1a2b3c4d5e6f7g8h9i0j
+```
+
+## Kubernetes Concepts Summary
+
+| Term | Meaning |
+|------|---------|
+| **Cluster** | All nodes working together as one system |
+| **Node** | Physical/virtual machine (Master or Worker) |
+| **Pod** | Smallest unit, wraps containers |
+| **Container** | Docker container running in a Pod |
+| **Service** | Network abstraction, routes traffic to Pods |
+| **Volume** | Persistent storage mounted to Pods |
+| **Deployment** | Manages Pod replicas and updates |
+| **Replica Set** | Ensures N copies of a Pod running |
+| **Namespace** | Virtual cluster subdivision |
+| **Label** | Key-value pair for selecting Pods |
+
+## Traffic Flow Example
+
+```
+User's Browser
+    │
+    │ GET blog.example.com:80
+    │
+    ▼
+Internet
+    │
+    │ (DNS resolves to LoadBalancer IP)
+    ▼
+LoadBalancer Service (External IP)
+    │
+    │ (Kubernetes routes based on selectors)
+    │
+    ├─► Pod: blog-backend (Node Worker-1)
+    │   └─► Container: Node.js app (port 3000)
+    │
+    └─► Pod: blog-backend (Node Worker-2)
+        └─► Container: Node.js app (port 3000)
+        
+        (User's request reaches one of the Pods)
+        
+        If database is needed:
+        Pod queries blog-db Service (ClusterIP)
+            │
+            └─► Pod: blog-database
+                └─► Container: PostgreSQL
+```
+
+## Tips for Excellent Diagram
+
+1. Use consistent colors for different components
+2. Use clear arrows showing data flow
+3. Label every significant element
+4. Include port numbers where relevant
+5. Show replica counts (e.g., "2 replicas")
+6. Make it readable by someone who just learned Kubernetes
+7. Include a legend explaining symbols
+8. Show both control plane (Master) and data plane (Workers)
+9. Demonstrate how requests reach applications
+10. Make it professional and organized
+
+This completes the Kubernetes architecture diagram requirements!
