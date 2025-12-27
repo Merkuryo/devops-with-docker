@@ -66,14 +66,15 @@ Exercise 3.2 adds automated deployment via GitHub Actions. Every push to the mai
 - **3.7 Project with Preinstalled Environments** ✓ - [Leveraging preinstalled Docker base images (node:16-alpine, golang:1.16-alpine) for optimal image composition](part-2/chapter-4/exercises/3.7-project-with-preinstalled-environments/)
 - **3.8 Multi-Stage Frontend** ✓ - [Multi-stage Docker build for frontend: Node.js build stage + Nginx serving stage with 86% size reduction](part-2/chapter-4/exercises/3.8-multi-stage-frontend/)
 - **3.9 Multi-Stage Backend** ✓ - [Multi-stage Go binary with FROM scratch: 97% size reduction (400MB → 12MB) for production microservices](part-2/chapter-4/exercises/3.9-multi-stage-backend/)
+- **3.10 Optimal Sized Image** ✓ - [Complete optimization case study: 992MB → 35MB (96% reduction) with security, performance, and best practices](part-2/chapter-4/exercises/3.10-optimal-sized-image/)
 
 ## Statistics
 
-- **Total Exercises Completed:** 36/36
+- **Total Exercises Completed:** 37/37
   - Part 1: 16/16 exercises ✓
   - Part 2, Chapter 1: 11/11 exercises ✓
   - Part 2, Chapter 3: 4/4 exercises ✓
-  - Part 2, Chapter 4: 5/5 exercises ✓
+  - Part 2, Chapter 4: 6/6 exercises ✓
 
 - **Technologies Mastered:**
   - Docker containers and images
@@ -103,6 +104,8 @@ Exercise 3.2 adds automated deployment via GitHub Actions. Every push to the mai
   - FROM scratch for minimal images
   - Static Go compilation (CGO_ENABLED=0)
   - Binary optimization and symbol stripping
+  - Complete Docker optimization case studies
+  - Before/after performance and size comparisons
 
 ## Repository Structure
 
@@ -157,7 +160,8 @@ Exercise 3.2 adds automated deployment via GitHub Actions. Every push to the mai
             ├── 3.6-optimized-project-images/
             ├── 3.7-project-with-preinstalled-environments/
             ├── 3.8-multi-stage-frontend/
-            └── 3.9-multi-stage-backend/
+            ├── 3.9-multi-stage-backend/
+            └── 3.10-optimal-sized-image/
 ```
 
 ## About This Course
