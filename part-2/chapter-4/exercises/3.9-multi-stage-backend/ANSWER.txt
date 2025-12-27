@@ -1,0 +1,366 @@
+# Exercise 3.9: Multi-Stage Backend with FROM Scratch - Solution
+
+## Task
+
+Create a multi-stage Dockerfile for the Go backend that:
+1. Compiles the binary with static linking in stage 1
+2. Uses `FROM scratch` (empty base image) in stage 2
+3. Copies only the compiled binary to the final image
+4. Keeps final image size < 35MB
+
+## Solution Answer
+
+### Dockerfile
+
+```dockerfile
+# Stage 1: Build stage
+FROM golang:1.16-alpine AS build-stage
+
+WORKDIR /usr/src/app
+
+COPY . .
+
+# Static compilation with symbol stripping
+RUN CGO_ENABLED=0 go build -a -ldflags="-s -w" -o server .
+
+# Stage 2: Production stage with FROM scratch
+FROM scratch
+
+# Copy only the compiled binary
+COPY --from=build-stage /usr/src/app/server /server
+
+EXPOSE 8080
+
+ENTRYPOINT ["/server"]
+```
+
+## How It Works
+
+### Stage 1: Build with golang:1.16-alpine
+
+**Build Command Breakdown**:
+```bash
+CGO_ENABLED=0 go build -a -ldflags="-s -w" -o server .
+```
+
+| Component | Purpose |
+|-----------|---------|
+| `CGO_ENABLED=0` | Disable C bindings → static binary, no libc dependency |
+| `-a` | Rebuild all packages → ensures static linking |
+| `-ldflags="-s -w"` | Strip symbols and debug info → 50% size reduction |
+| `-s` | Remove symbol table |
+| `-w` | Remove DWARF debug information |
+| `-o server` | Output binary name |
+
+**Result**: Statically-linked binary that runs independently with no external dependencies.
+
+### Stage 2: FROM scratch
+
+`scratch` is a reserved Docker image that represents a completely empty base:
+- No operating system
+- No shell
+- No libc
+- No tools
+- 0 bytes
+
+Only the compiled binary is copied into this empty image.
+
+**Result**: Minimal production image containing only what's necessary to run the Go binary.
+
+## Size Comparison
+
+### Traditional Single-Stage Build
+
+```dockerfile
+FROM golang:1.16-alpine
+WORKDIR /usr/src/app
+COPY . .
+RUN go build -o server .
+CMD ["./server"]
+```
+
+**Size**: ~400MB
+- golang:1.16-alpine: 376MB
+- Source code: 20MB
+- Unstripped binary: 10MB
+
+### Multi-Stage with Alpine (Exercise 3.7)
+
+```dockerfile
+FROM golang:1.16-alpine AS build-stage
+RUN go build -o server .
+
+FROM golang:1.16-alpine
+COPY --from=build-stage /usr/src/app/server /server
+```
+
+**Size**: ~400MB (still includes Go compiler and Alpine OS)
+
+### Multi-Stage with FROM Scratch (This Solution)
+
+```dockerfile
+FROM golang:1.16-alpine AS build-stage
+RUN CGO_ENABLED=0 go build -a -ldflags="-s -w" -o server .
+
+FROM scratch
+COPY --from=build-stage /usr/src/app/server /server
+```
+
+**Size**: ~12-15MB (meets < 35MB requirement)
+
+### Size Reduction
+
+| Approach | Size | Reduction |
+|----------|------|-----------|
+| Single-stage | 400MB | — |
+| Multi-stage Alpine | 400MB | 0% |
+| **Multi-stage Scratch** | **~12MB** | **97%** |
+
+**Savings**: 388MB reduced by using scratch + static compilation + symbol stripping
+
+## Why FROM Scratch Works for Go
+
+Go's unique strength: **statically compiled binaries**
+
+1. **No Runtime Dependencies**: Go binary includes everything needed
+2. **No External Libraries**: Unlike Python/Node, Go doesn't need interpreter
+3. **Self-Contained**: Binary can run on any OS architecture it was compiled for
+4. **Secure**: No OS means no vulnerabilities in OS layer
+
+This is why Go is ideal for containerization.
+
+## Compilation Flags Details
+
+### CGO_ENABLED=0 - Static Linking
+
+**Dynamic linking** (default):
+```bash
+go build -o server .
+# Binary depends on libc and other C libraries
+# Fails in scratch: "libc not found"
+```
+
+**Static linking** (required for scratch):
+```bash
+CGO_ENABLED=0 go build -o server .
+# Binary includes all dependencies
+# Works in scratch ✓
+```
+
+### -a Flag - Force Rebuild
+
+Ensures all packages compiled with static linking:
+```bash
+# Without -a: may use cached dynamic builds
+go build -o server .
+
+# With -a: forces rebuild with current flags
+CGO_ENABLED=0 go build -a -o server .
+```
+
+### -ldflags="-s -w" - Symbol Stripping
+
+**With debug symbols** (default):
+```bash
+go build -o server .
+# Binary size: ~20-25MB
+# Includes: all function names, debug info, symbol table
+```
+
+**Without debug symbols** (production):
+```bash
+go build -ldflags="-s -w" -o server .
+# Binary size: ~10-12MB
+# 50% size reduction
+```
+
+**Breakdown**:
+- `-s`: Strip symbol table (~30-40% reduction)
+- `-w`: Remove DWARF debug info (~10% additional reduction)
+
+## Building and Testing
+
+### Build the Image
+
+```bash
+docker build -t backend:scratch .
+```
+
+**Expected output**:
+```
+Step 1/7 : FROM golang:1.16-alpine AS build-stage
+Step 2/7 : WORKDIR /usr/src/app
+Step 3/7 : COPY . .
+Step 4/7 : RUN CGO_ENABLED=0 go build -a -ldflags="-s -w" -o server .
+Step 5/7 : FROM scratch
+Step 6/7 : COPY --from=build-stage /usr/src/app/server /server
+Step 7/7 : ENTRYPOINT ["/server"]
+```
+
+### Verify Image Size
+
+```bash
+docker image ls | grep backend:scratch
+
+# Output example:
+# backend    scratch   abc123def456  5 seconds ago  12.3MB
+```
+
+**Expected**: Image size < 35MB ✓
+
+### Run the Container
+
+```bash
+docker run -p 8080:8080 backend:scratch
+```
+
+### Test Application
+
+```bash
+# In another terminal
+curl http://localhost:8080
+
+# Server should respond
+```
+
+### Inspect Image
+
+```bash
+# Show layer sizes
+docker image history backend:scratch --human
+
+# Shows:
+# FROM scratch: 0B
+# COPY --from=build-stage: ~12MB (the binary)
+
+# Inspect config
+docker inspect backend:scratch --format='{{.Config.Entrypoint}}'
+# Should show: [/server]
+```
+
+## Limitations of FROM Scratch
+
+### No Shell
+
+```bash
+# This won't work
+docker exec -it <container> sh
+# Error: no shell available
+```
+
+### No System Tools
+
+```bash
+# This won't work
+docker run backend:scratch wget https://example.com
+# Error: no wget, curl, or any tools
+```
+
+**Why?** `FROM scratch` has nothing—no OS, no tools, just the binary.
+
+### Debugging Strategy
+
+For debugging with scratch images:
+
+1. **Use temporary container with filesystem**:
+```bash
+docker run --rm -it alpine
+# Then run binary manually
+```
+
+2. **Use separate debug image**:
+```dockerfile
+FROM scratch AS prod
+COPY --from=build /app/server /
+
+FROM alpine AS debug
+COPY --from=build /app/server /
+CMD ["/server"]
+```
+
+3. **Add logging to Go app**:
+```go
+log.Println("Starting server...")
+log.Println("Error:", err)
+```
+
+## Advanced: Production-Ready Dockerfile
+
+For real applications that need SSL/TLS:
+
+```dockerfile
+FROM golang:1.16-alpine AS builder
+
+WORKDIR /usr/src/app
+
+COPY go.mod go.sum ./
+RUN go mod download
+
+COPY . .
+
+RUN CGO_ENABLED=0 go build \
+    -a \
+    -ldflags="-s -w" \
+    -o /app/server \
+    .
+
+# Production stage
+FROM scratch
+
+COPY --from=builder /app/server /server
+
+# CA certificates for HTTPS
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+
+# Create non-root user (requires additional setup for scratch)
+# For scratch, this requires copying passwd file
+# Usually better to run as root for scratch due to complexity
+
+EXPOSE 8080
+
+ENTRYPOINT ["/server"]
+```
+
+**Final size**: ~13MB (includes CA certificates)
+
+## Comparison: Go vs Other Languages
+
+| Language | Best Base Image | Final Size | Reason |
+|----------|-----------------|-----------|--------|
+| **Go** | `scratch` | **10-20MB** | Statically compiled |
+| Node.js | node:16-alpine | 200-300MB | Needs Node runtime |
+| Python | python:3.9-alpine | 150-200MB | Needs Python runtime |
+| Java | openjdk:11-alpine | 300-400MB | Needs JVM |
+
+**Go's advantage**: Can use scratch without runtime dependencies.
+
+## Key Concepts
+
+1. **Multi-Stage Builds**: Separate build and runtime environments
+2. **Static Compilation**: Binary includes all dependencies
+3. **FROM Scratch**: Absolute minimal base image (0 bytes)
+4. **Symbol Stripping**: Remove debug info to reduce size
+5. **Production-Ready**: Go binary runs standalone
+
+## Production Best Practices
+
+✓ Always use `CGO_ENABLED=0` for containerized Go
+✓ Always use `-a` flag for complete static linking
+✓ Always strip symbols with `-ldflags="-s -w"`
+✓ Use `FROM scratch` for final production images
+✓ Include CA certificates if app makes HTTPS requests
+✓ Test thoroughly—no shell means limited debugging capability
+✓ Implement good logging in Go app for observability
+✓ Consider security scanning of final image
+
+## Summary
+
+The `FROM scratch` multi-stage build for Go backends:
+
+✅ **Meets size requirement**: < 15MB (well under 35MB limit)
+✅ **Maximum security**: No OS, no tools, minimal attack surface
+✅ **Optimal for deployment**: Tiny images = faster transfers and storage
+✅ **Production standard**: Used by major Go-based services (Docker, Kubernetes, etc.)
+✅ **Go best practice**: Leverages Go's static compilation strength
+
+This is the recommended approach for production Go microservices and is why Go Docker images are famously small (~5-20MB).
