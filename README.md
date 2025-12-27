@@ -67,14 +67,15 @@ Exercise 3.2 adds automated deployment via GitHub Actions. Every push to the mai
 - **3.8 Multi-Stage Frontend** ✓ - [Multi-stage Docker build for frontend: Node.js build stage + Nginx serving stage with 86% size reduction](part-2/chapter-4/exercises/3.8-multi-stage-frontend/)
 - **3.9 Multi-Stage Backend** ✓ - [Multi-stage Go binary with FROM scratch: 97% size reduction (400MB → 12MB) for production microservices](part-2/chapter-4/exercises/3.9-multi-stage-backend/)
 - **3.10 Optimal Sized Image** ✓ - [Complete optimization case study: 992MB → 35MB (96% reduction) with security, performance, and best practices](part-2/chapter-4/exercises/3.10-optimal-sized-image/)
+- **3.11 Kubernetes** ✓ - [Kubernetes architecture diagram: multi-host cluster with master/worker nodes, Pods, Services, and applications](part-2/chapter-4/exercises/3.11-kubernetes/)
 
 ## Statistics
 
-- **Total Exercises Completed:** 37/37
+- **Total Exercises Completed:** 38/38
   - Part 1: 16/16 exercises ✓
   - Part 2, Chapter 1: 11/11 exercises ✓
   - Part 2, Chapter 3: 4/4 exercises ✓
-  - Part 2, Chapter 4: 6/6 exercises ✓
+  - Part 2, Chapter 4: 7/7 exercises ✓
 
 - **Technologies Mastered:**
   - Docker containers and images
@@ -106,6 +107,8 @@ Exercise 3.2 adds automated deployment via GitHub Actions. Every push to the mai
   - Binary optimization and symbol stripping
   - Complete Docker optimization case studies
   - Before/after performance and size comparisons
+  - Kubernetes architecture and components
+  - Multi-host container orchestration concepts
 
 ## Repository Structure
 
@@ -161,7 +164,8 @@ Exercise 3.2 adds automated deployment via GitHub Actions. Every push to the mai
             ├── 3.7-project-with-preinstalled-environments/
             ├── 3.8-multi-stage-frontend/
             ├── 3.9-multi-stage-backend/
-            └── 3.10-optimal-sized-image/
+            ├── 3.10-optimal-sized-image/
+            └── 3.11-kubernetes/
 ```
 
 ## About This Course
